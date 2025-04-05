@@ -1,45 +1,63 @@
+/**
+ * Wardrobe page component.
+ * This file implements the main wardrobe interface with:
+ * - Clothing item management
+ * - Category organization
+ * - Item display and filtering
+ * - Add/Edit/Delete functionality
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { WardrobeGrid } from "~/app/_components/wardrobe-grid";
+import { WardrobeCategories } from "~/app/_components/wardrobe-categories";
+
+type WardrobeItem = {
+  image: string;
+  category: string;
+  subcategory: string;
+};
 
 export default function WardrobePage() {
-  const [images, setImages] = useState<string[]>([]);
+  const [items, setItems] = useState<WardrobeItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("Upper Body");
+  const [selectedSubcategory, setSelectedSubcategory] = useState("T-Shirts");
 
-  // Load images from localStorage when component mounts
+  // Load items from localStorage when component mounts
   useEffect(() => {
     try {
-      const savedImages = localStorage.getItem('wardrobeImages');
-      if (savedImages) {
-        const parsedImages = JSON.parse(savedImages);
-        console.log('Loaded images from localStorage:', parsedImages.length);
-        setImages(parsedImages);
+      const savedItems = localStorage.getItem('wardrobeItems');
+      if (savedItems) {
+        const parsedItems = JSON.parse(savedItems);
+        console.log('Loaded items from localStorage:', parsedItems.length);
+        setItems(parsedItems);
       }
     } catch (error) {
-      console.error('Error loading images from localStorage:', error);
+      console.error('Error loading items from localStorage:', error);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Save images to localStorage whenever they change
+  // Save items to localStorage whenever they change
   useEffect(() => {
     if (!isLoading) {
       try {
-        console.log('Saving images to localStorage:', images.length);
-        localStorage.setItem('wardrobeImages', JSON.stringify(images));
+        console.log('Saving items to localStorage:', items.length);
+        localStorage.setItem('wardrobeItems', JSON.stringify(items));
       } catch (error) {
-        console.error('Error saving images to localStorage:', error);
+        console.error('Error saving items to localStorage:', error);
       }
     }
-  }, [images, isLoading]);
+  }, [items, isLoading]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    const newImages: string[] = [];
+    const newItems: WardrobeItem[] = [];
     let loadedCount = 0;
     
     for (let i = 0; i < files.length; i++) {
@@ -50,13 +68,17 @@ export default function WardrobePage() {
       
       reader.onload = (event) => {
         if (event.target?.result) {
-          newImages.push(event.target.result as string);
+          newItems.push({
+            image: event.target.result as string,
+            category: selectedCategory,
+            subcategory: selectedSubcategory
+          });
           loadedCount++;
           
-          // Update images as each file is loaded
+          // Update items as each file is loaded
           if (loadedCount === files.length) {
-            console.log('All files loaded, updating state with', newImages.length, 'new images');
-            setImages(prevImages => [...newImages, ...prevImages]);
+            console.log('All files loaded, updating state with', newItems.length, 'new items');
+            setItems(prevItems => [...newItems, ...prevItems]);
           }
         }
       };
@@ -65,10 +87,27 @@ export default function WardrobePage() {
     }
   };
 
+  const handleCategorySelect = (category: string, subcategory: string) => {
+    setSelectedCategory(category);
+    setSelectedSubcategory(subcategory);
+  };
+
+  const filteredItems = items.filter(
+    item => item.category === selectedCategory && item.subcategory === selectedSubcategory
+  );
+
   return (
     <div className="py-8">
-      <h1 className="text-3xl font-light mb-8">your wardrobe</h1>
-      <WardrobeGrid images={images} onImageUpload={handleImageUpload} />
+      <h1 className="text-4xl md:text-5xl font-light mb-8 text-center">
+        wardrobe <span className="font-bold">Y</span>
+      </h1>
+      <div className="max-w-4xl mx-auto px-4">
+        <WardrobeCategories onCategorySelect={handleCategorySelect} />
+        <WardrobeGrid 
+          images={filteredItems.map(item => item.image)} 
+          onImageUpload={handleImageUpload} 
+        />
+      </div>
     </div>
   );
 } 

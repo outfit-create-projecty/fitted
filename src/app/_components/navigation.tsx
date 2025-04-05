@@ -1,3 +1,13 @@
+/**
+ * Navigation component for the application.
+ * This file implements a responsive navigation bar with:
+ * - Desktop and mobile views
+ * - Active link highlighting
+ * - Mobile menu toggle
+ * - Brand logo
+ * - Navigation items for wardrobe and outfits
+ */
+
 "use client";
 
 import Link from "next/link";
