@@ -19,8 +19,8 @@ export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
-    { name: "wardrobe", path: "/wardrobe" },
-    { name: "outfits", path: "/outfits" },
+    { name: "Wardrobe", path: "/wardrobe" },
+    { name: "Outfits", path: "/outfits" },
   ];
 
   return (
@@ -28,8 +28,8 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-white text-2xl font-bold">
-              Y
+            <Link href="/" className="text-white text-2xl font-light">
+              <span className="font-bold">Y</span>
             </Link>
           </div>
           

@@ -99,7 +99,7 @@ export default function WardrobePage() {
   return (
     <div className="py-8">
       <h1 className="text-4xl md:text-5xl font-light mb-8 text-center">
-        wardrobe <span className="font-bold">Y</span>
+        Wardrobe <span className="font-bold">Y</span>
       </h1>
       <div className="max-w-4xl mx-auto px-4">
         <WardrobeCategories onCategorySelect={handleCategorySelect} />
