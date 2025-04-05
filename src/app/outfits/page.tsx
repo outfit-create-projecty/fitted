@@ -45,7 +45,27 @@ export default function OutfitsPage() {
       const savedOutfits = localStorage.getItem('outfits');
       if (savedOutfits) {
         const parsedOutfits = JSON.parse(savedOutfits);
+        console.log("Loaded outfits from localStorage:", parsedOutfits);
         setOutfits(parsedOutfits);
+        
+        // If there's a selected outfit, make sure it's still in the loaded outfits
+        if (selectedOutfit) {
+          const selectedOutfitStillExists = parsedOutfits.some(
+            (outfit: Outfit) => outfit.id === selectedOutfit.id
+          );
+          
+          if (!selectedOutfitStillExists) {
+            console.log("Selected outfit no longer exists, resetting selected outfit");
+            setSelectedOutfit(null);
+          } else {
+            // Update the selected outfit with the latest version from localStorage
+            const updatedSelectedOutfit = parsedOutfits.find(
+              (outfit: Outfit) => outfit.id === selectedOutfit.id
+            );
+            console.log("Updating selected outfit with latest version:", updatedSelectedOutfit);
+            setSelectedOutfit(updatedSelectedOutfit);
+          }
+        }
       }
     } catch (error) {
       console.error('Error loading outfits from localStorage:', error);
@@ -56,6 +76,19 @@ export default function OutfitsPage() {
   useEffect(() => {
     try {
       localStorage.setItem('outfits', JSON.stringify(outfits));
+      console.log("Saved outfits to localStorage:", outfits);
+      
+      // If there's a selected outfit, make sure it's updated in the state
+      if (selectedOutfit) {
+        const updatedSelectedOutfit = outfits.find(
+          (outfit: Outfit) => outfit.id === selectedOutfit.id
+        );
+        
+        if (updatedSelectedOutfit && JSON.stringify(updatedSelectedOutfit) !== JSON.stringify(selectedOutfit)) {
+          console.log("Updating selected outfit with latest version:", updatedSelectedOutfit);
+          setSelectedOutfit(updatedSelectedOutfit);
+        }
+      }
     } catch (error) {
       console.error('Error saving outfits to localStorage:', error);
     }
@@ -86,42 +119,69 @@ export default function OutfitsPage() {
   }, []);
 
   const handleAddOutfit = (newOutfit: { title: string; items: WardrobeItem[]; icon: string }) => {
+    console.log("Creating new outfit:", newOutfit.title, "with items:", newOutfit.items.length);
     const outfit: Outfit = {
       id: Date.now().toString(),
       ...newOutfit
     };
-    setOutfits([...outfits, outfit]);
+    const updatedOutfits = [...outfits, outfit];
+    setOutfits(updatedOutfits);
+    
+    // Immediately save to localStorage
+    try {
+      localStorage.setItem('outfits', JSON.stringify(updatedOutfits));
+      console.log("Immediately saved new outfit to localStorage:", updatedOutfits);
+    } catch (error) {
+      console.error('Error saving outfits to localStorage:', error);
+    }
   };
 
   const handleEditOutfit = (editedOutfit: { id: string; title: string; items: WardrobeItem[]; icon: string }) => {
-    if (editMode === 'items' && editedOutfit.items.length > 0) {
-      // When editing a single item, merge the edited item with the existing outfit
-      const originalOutfit = outfits.find(outfit => outfit.id === editedOutfit.id);
-      if (originalOutfit) {
-        const editedItem = editedOutfit.items[0];
-        if (editedItem) {
-          const updatedItems = originalOutfit.items.map(item => 
-            item.id === editedItem.id ? editedItem : item
-          );
-          
-          const updatedOutfit: Outfit = {
-            ...originalOutfit,
-            items: updatedItems
-          };
-          
-          setOutfits(outfits.map(outfit => 
-            outfit.id === editedOutfit.id ? updatedOutfit : outfit
-          ));
-        }
-      }
+    console.log("handleEditOutfit called with:", editedOutfit);
+    console.log("Current editMode:", editMode);
+    console.log("Current outfits before update:", outfits);
+    
+    // Always update the entire outfit with the edited outfit
+    console.log("Updating outfit:", editedOutfit);
+    
+    // Create a new array with the updated outfit
+    const updatedOutfits = [...outfits];
+    const index = updatedOutfits.findIndex(outfit => outfit.id === editedOutfit.id);
+    
+    if (index !== -1) {
+      console.log("Found matching outfit at index", index, "updating it");
+      updatedOutfits[index] = editedOutfit;
     } else {
-      // For other edit modes (title, icon), update the entire outfit
-      setOutfits(outfits.map(outfit => 
-        outfit.id === editedOutfit.id ? editedOutfit : outfit
-      ));
+      console.log("No matching outfit found, adding new outfit");
+      updatedOutfits.push(editedOutfit);
     }
+    
+    console.log("Updated outfits:", updatedOutfits);
+    
+    // Update the outfits state with the new array
+    setOutfits(updatedOutfits);
+    
+    // Immediately save to localStorage
+    try {
+      localStorage.setItem('outfits', JSON.stringify(updatedOutfits));
+      console.log("Immediately saved updated outfits to localStorage:", updatedOutfits);
+    } catch (error) {
+      console.error('Error saving outfits to localStorage:', error);
+    }
+    
+    // Reset editing state
     setEditingOutfit(null);
     setEditMode(null);
+    
+    // Update the selected outfit if it's the one being edited
+    if (selectedOutfit && selectedOutfit.id === editedOutfit.id) {
+      console.log("Updating selected outfit with edited outfit:", editedOutfit);
+      setSelectedOutfit(editedOutfit);
+    }
+    
+    // Don't reset selected category or items
+    // setSelectedCategory(null);
+    // setSelectedItems([]);
   };
 
   const handleEditTitle = (outfit: Outfit) => {
@@ -130,8 +190,12 @@ export default function OutfitsPage() {
   };
 
   const handleEditItems = (outfit: Outfit) => {
+    console.log("handleEditItems called with outfit:", outfit);
     setEditingOutfit(outfit);
     setEditMode('items');
+    console.log("Set editMode to 'items'");
+    // Don't reset category selection or selected items
+    // The AddOutfitForm component will handle this
   };
 
   const handleEditIcon = (outfit: Outfit) => {
@@ -159,9 +223,18 @@ export default function OutfitsPage() {
 
   const handleDeleteOutfit = () => {
     if (selectedOutfit) {
-      setOutfits(outfits.filter(outfit => outfit.id !== selectedOutfit.id));
+      const updatedOutfits = outfits.filter(outfit => outfit.id !== selectedOutfit.id);
+      setOutfits(updatedOutfits);
       setSelectedOutfit(null);
       setShowDeleteConfirm(false);
+      
+      // Immediately save to localStorage
+      try {
+        localStorage.setItem('outfits', JSON.stringify(updatedOutfits));
+        console.log("Immediately saved after deleting outfit to localStorage:", updatedOutfits);
+      } catch (error) {
+        console.error('Error saving outfits to localStorage:', error);
+      }
     }
   };
 
@@ -266,7 +339,7 @@ export default function OutfitsPage() {
         )}
 
         {/* Selected Outfit Details */}
-        {selectedOutfit && !editingOutfit && (
+        {selectedOutfit && (
           <div className="mt-4 bg-gray-800 rounded-lg p-4 max-w-md mx-auto">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">{selectedOutfit.title}</h3>
@@ -282,117 +355,64 @@ export default function OutfitsPage() {
                     {selectedOutfit.icon}
                   </div>
                 )}
-                <button
-                  onClick={() => handleEditTitle(selectedOutfit)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                  title="Edit title"
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  onClick={() => handleEditItems(selectedOutfit)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                  title="Edit items"
-                >
-                  <Plus size={16} />
-                </button>
-                <button
-                  onClick={() => handleEditIcon(selectedOutfit)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                  title="Edit icon"
-                >
-                  <Image size={16} />
-                </button>
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="text-red-400 hover:text-red-300 transition-colors"
-                  title="Delete outfit"
-                >
-                  <Trash2 size={16} />
-                </button>
-                <button
-                  onClick={() => setSelectedOutfit(null)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <X size={20} />
-                </button>
+                {!editingOutfit && (
+                  <>
+                    <button
+                      onClick={() => handleEditTitle(selectedOutfit)}
+                      className="text-gray-400 hover:text-white transition-colors"
+                      title="Edit title"
+                    >
+                      <span className="text-lg font-bold">T</span>
+                    </button>
+                    <button
+                      onClick={() => handleEditItems(selectedOutfit)}
+                      className="text-gray-400 hover:text-white transition-colors"
+                      title="Edit items"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleEditIcon(selectedOutfit)}
+                      className="text-gray-400 hover:text-white transition-colors"
+                      title="Edit icon"
+                    >
+                      <Image size={16} />
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="text-red-400 hover:text-red-300 transition-colors"
+                      title="Delete outfit"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedOutfit(null)}
+                      className="text-gray-400 hover:text-white transition-colors"
+                      title="Close"
+                    >
+                      <X size={16} />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
-            <div className="flex gap-3">
-              {/* Main clothing items */}
-              <div className="flex-1 space-y-2 max-w-[200px]">
-                {/* Upper Body */}
-                {selectedOutfit.items.filter(item => item.category === "Upper Body").map((item) => (
+            
+            {!editingOutfit && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+                {selectedOutfit.items.map((item) => (
                   <div key={item.id} className="relative group">
                     <img
                       src={item.imageUrl}
                       alt={item.name}
                       className="w-full h-32 object-cover rounded-lg"
                     />
-                    <button
-                      onClick={() => handleEditItem(selectedOutfit, item.id)}
-                      className="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1 hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
-                      title="Edit item"
-                    >
-                      <Edit size={16} />
-                    </button>
-                  </div>
-                ))}
-                {/* Lower Body */}
-                {selectedOutfit.items.filter(item => item.category === "Lower Body").map((item) => (
-                  <div key={item.id} className="relative group">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
-                    <button
-                      onClick={() => handleEditItem(selectedOutfit, item.id)}
-                      className="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1 hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
-                      title="Edit item"
-                    >
-                      <Edit size={16} />
-                    </button>
-                  </div>
-                ))}
-                {/* Shoes */}
-                {selectedOutfit.items.filter(item => item.category === "Shoes").map((item) => (
-                  <div key={item.id} className="relative group">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-full h-24 object-cover rounded-lg"
-                    />
-                    <button
-                      onClick={() => handleEditItem(selectedOutfit, item.id)}
-                      className="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1 hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
-                      title="Edit item"
-                    >
-                      <Edit size={16} />
-                    </button>
+                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-sm">{item.name}</span>
+                    </div>
                   </div>
                 ))}
               </div>
-              {/* Accessories */}
-              <div className="w-24 space-y-2">
-                {selectedOutfit.items.filter(item => item.category === "Accessories").map((item) => (
-                  <div key={item.id} className="relative group">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-full h-24 object-cover rounded-lg"
-                    />
-                    <button
-                      onClick={() => handleEditItem(selectedOutfit, item.id)}
-                      className="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1 hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
-                      title="Edit item"
-                    >
-                      <Edit size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+            )}
           </div>
         )}
 
