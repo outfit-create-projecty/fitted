@@ -16,11 +16,19 @@ interface AddOutfitFormProps {
   onAddOutfit: (outfit: { title: string; items: WardrobeItem[]; icon: string }) => void;
 }
 
+const categories = [
+  { name: "Upper Body", value: "Upper Body" },
+  { name: "Lower Body", value: "Lower Body" },
+  { name: "Shoes", value: "Shoes" },
+  { name: "Accessories", value: "Accessories" }
+];
+
 export function AddOutfitForm({ wardrobeItems, onAddOutfit }: AddOutfitFormProps) {
   const [title, setTitle] = useState("");
   const [selectedItems, setSelectedItems] = useState<WardrobeItem[]>([]);
   const [selectedIcon, setSelectedIcon] = useState<string>("");
   const [showIconUpload, setShowIconUpload] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("Upper Body");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleIconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +66,15 @@ export function AddOutfitForm({ wardrobeItems, onAddOutfit }: AddOutfitFormProps
       setSelectedIcon("");
     }
   };
+
+  const filteredItems = wardrobeItems.filter(item => item.category === selectedCategory);
+
+  const isFormValid = title && selectedItems.length > 0 && selectedIcon;
+  const missingRequirements = [
+    !title && "Enter an outfit title",
+    selectedItems.length === 0 && "Select at least one clothing item",
+    !selectedIcon && "Upload an outfit icon"
+  ].filter(Boolean);
 
   return (
     <div className="bg-gray-800 rounded-lg p-6 mb-8">
@@ -134,8 +151,27 @@ export function AddOutfitForm({ wardrobeItems, onAddOutfit }: AddOutfitFormProps
           <label className="block text-sm font-medium text-gray-300 mb-1">
             Select Clothes from Wardrobe
           </label>
+          
+          {/* Category Tabs */}
+          <div className="flex space-x-4 mb-4 overflow-x-auto pb-2">
+            {categories.map((category) => (
+              <button
+                key={category.value}
+                onClick={() => setSelectedCategory(category.value)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+                  selectedCategory === category.value
+                    ? "bg-white text-black"
+                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Wardrobe Items Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {wardrobeItems.map((item) => (
+            {filteredItems.map((item) => (
               <div
                 key={item.id}
                 className={`relative group cursor-pointer ${
@@ -182,9 +218,20 @@ export function AddOutfitForm({ wardrobeItems, onAddOutfit }: AddOutfitFormProps
           </div>
         )}
 
+        {missingRequirements.length > 0 && (
+          <div className="text-red-400 text-sm">
+            <p className="font-medium mb-1">Missing requirements:</p>
+            <ul className="list-disc list-inside">
+              {missingRequirements.map((req, index) => (
+                <li key={index}>{req}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <button
           type="submit"
-          disabled={!title || selectedItems.length === 0 || !selectedIcon}
+          disabled={!isFormValid}
           className="w-full bg-white text-black rounded-lg px-4 py-2 font-medium hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Create Outfit

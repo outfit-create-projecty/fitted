@@ -11,6 +11,7 @@
 
 import { useState, useEffect } from "react";
 import { AddOutfitForm } from "../_components/add-outfit-form";
+import { X, Trash2 } from "lucide-react";
 
 interface WardrobeItem {
   id: string;
@@ -32,21 +33,22 @@ export default function OutfitsPage() {
   const [wardrobeItems, setWardrobeItems] = useState<WardrobeItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOutfit, setSelectedOutfit] = useState<Outfit | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     // Load wardrobe items from localStorage
     const loadWardrobeItems = () => {
       try {
-        const savedItems = localStorage.getItem('wardrobeImages');
+        const savedItems = localStorage.getItem('wardrobeItems');
         if (savedItems) {
           const parsedItems = JSON.parse(savedItems);
           // Convert the saved items to the WardrobeItem format
-          const formattedItems = parsedItems.map((item: string, index: number) => ({
+          const formattedItems = parsedItems.map((item: { image: string, category: string, subcategory: string }, index: number) => ({
             id: `item-${index}`,
             name: `Item ${index + 1}`,
-            category: 'Uncategorized',
-            subcategory: 'Uncategorized',
-            imageUrl: item
+            category: item.category,
+            subcategory: item.subcategory,
+            imageUrl: item.image
           }));
           setWardrobeItems(formattedItems);
         }
@@ -70,6 +72,14 @@ export default function OutfitsPage() {
     e.preventDefault();
     // This would be connected to the backend later
     console.log("Searching for outfits with query:", searchQuery);
+  };
+
+  const handleDeleteOutfit = () => {
+    if (selectedOutfit) {
+      setOutfits(outfits.filter(outfit => outfit.id !== selectedOutfit.id));
+      setSelectedOutfit(null);
+      setShowDeleteConfirm(false);
+    }
   };
 
   return (
@@ -153,11 +163,26 @@ export default function OutfitsPage() {
           <div className="mt-8 bg-gray-800 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-medium">{selectedOutfit.title}</h3>
-              <img
-                src={selectedOutfit.icon}
-                alt="Outfit icon"
-                className="w-8 h-8 object-cover rounded-lg"
-              />
+              <div className="flex items-center space-x-4">
+                <img
+                  src={selectedOutfit.icon}
+                  alt="Outfit icon"
+                  className="w-8 h-8 object-cover rounded-lg"
+                />
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-red-400 hover:text-red-300 transition-colors"
+                  title="Delete outfit"
+                >
+                  <Trash2 size={20} />
+                </button>
+                <button
+                  onClick={() => setSelectedOutfit(null)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               {selectedOutfit.items.map((item) => (
@@ -169,6 +194,32 @@ export default function OutfitsPage() {
                   />
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-xl font-medium mb-4">Delete Outfit</h3>
+              <p className="text-gray-300 mb-6">
+                Are you sure you want to delete this outfit? This action cannot be undone.
+              </p>
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteOutfit}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         )}
