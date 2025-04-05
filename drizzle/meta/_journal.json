@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1743892188630,
+      "tag": "0000_lazy_electro",
+      "breakpoints": true
+    }
+  ]
+}

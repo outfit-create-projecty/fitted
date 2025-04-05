@@ -10,27 +10,6 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `projecty_${name}`);
 
-export const posts = createTable(
-  "post",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 256 }),
-    createdById: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: d
-      .timestamp({ withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-  }),
-  (t) => [
-    index("created_by_idx").on(t.createdById),
-    index("name_idx").on(t.name),
-  ],
-);
-
 export const users = createTable("user", (d) => ({
   id: d
     .varchar({ length: 255 })
@@ -106,3 +85,49 @@ export const verificationTokens = createTable(
   }),
   (t) => [primaryKey({ columns: [t.identifier, t.token] })],
 );
+
+export const clothingItems = createTable("clothing_item", (d) => ({
+  id: d.varchar({ length: 255 }).notNull().primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: d.varchar({ length: 255 }).notNull(),
+  description: d.varchar({ length: 4096 }).notNull(),
+  classification: d.varchar({ length: 255 }).notNull(),
+  image: d.varchar({ length: 255 }).notNull(),
+  userId: d.varchar({ length: 255 }).notNull().references(() => users.id),
+  tagsVector: d.vector({ dimensions: 1536 }).notNull(),
+}));
+
+export const clothingItemsRelations = relations(clothingItems, ({ one }) => ({
+  user: one(users, { fields: [clothingItems.userId], references: [users.id] }),
+}));
+
+export const outfits = createTable("outfit", (d) => ({
+  id: d.varchar({ length: 255 }).notNull().primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: d.varchar({ length: 255 }).notNull(),
+  prompt: d.varchar({ length: 4096 }).notNull(),
+  description: d.varchar({ length: 4096 }).notNull(),
+  topId: d.varchar({ length: 255 }).references(() => clothingItems.id),
+  bottomId: d.varchar({ length: 255 }).references(() => clothingItems.id),
+  miscId: d.varchar({ length: 255 }).references(() => clothingItems.id),
+  userId: d.varchar({ length: 255 }).notNull().references(() => users.id),
+}));
+
+export const outfitsRelations = relations(outfits, ({ one }) => ({
+  user: one(users, { fields: [outfits.userId], references: [users.id] }),
+  top: one(clothingItems, { fields: [outfits.topId], references: [clothingItems.id] }),
+  bottom: one(clothingItems, { fields: [outfits.bottomId], references: [clothingItems.id] }),
+  misc: one(clothingItems, { fields: [outfits.miscId], references: [clothingItems.id] }),
+}));
+
+export const clothingItemsOutfits = createTable("clothing_item_outfit", (d) => ({
+  clothingItemId: d.varchar({ length: 255 }).notNull().references(() => clothingItems.id),
+  outfitId: d.varchar({ length: 255 }).notNull().references(() => outfits.id),
+}), (t) => [primaryKey({ columns: [t.clothingItemId, t.outfitId] })]);
+
+export const clothingItemsOutfitsRelations = relations(clothingItemsOutfits, ({ one }) => ({
+  clothingItem: one(clothingItems, { fields: [clothingItemsOutfits.clothingItemId], references: [clothingItems.id] }),
+  outfit: one(outfits, { fields: [clothingItemsOutfits.outfitId], references: [outfits.id] }),
+}));
+
+export type User = typeof users.$inferSelect;
+export type ClothingItem = typeof clothingItems.$inferSelect;
+export type Outfit = typeof outfits.$inferSelect;
