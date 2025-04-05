@@ -50,7 +50,7 @@ export function AddOutfitForm({
 }: AddOutfitFormProps) {
   const [title, setTitle] = useState(editOutfit?.title ?? "");
   const [selectedItems, setSelectedItems] = useState<WardrobeItem[]>(editOutfit?.items ?? []);
-  const [selectedIcon, setSelectedIcon] = useState<string>(editOutfit?.icon ?? DEFAULT_ICON);
+  const [selectedIcon, setSelectedIcon] = useState<string | null>(editOutfit?.icon ?? null);
   const [showIconUpload, setShowIconUpload] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory ?? "Upper Body");
   const [feedbackMessage, setFeedbackMessage] = useState<string>("");
@@ -108,26 +108,43 @@ export function AddOutfitForm({
     return `UnNamed outfit ${nextNumber}`;
   };
 
+  const hasRequiredItems = () => {
+    const hasUpperBody = selectedItems.some(item => item.category === "Upper Body");
+    const hasLowerBody = selectedItems.some(item => item.category === "Lower Body");
+    const hasShoes = selectedItems.some(item => item.category === "Shoes");
+    return hasUpperBody && hasLowerBody && hasShoes;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (editOutfit && onEditOutfit) {
       // For editing, only update the fields that are being edited
       const updatedOutfit = {
         id: editOutfit.id,
         title: editMode === 'title' ? (title || generateDefaultTitle()) : editOutfit.title,
         items: editMode === 'items' ? selectedItems : editOutfit.items,
-        icon: editMode === 'icon' ? selectedIcon : editOutfit.icon
+        icon: editMode === 'icon' ? (selectedIcon || DEFAULT_ICON) : editOutfit.icon
       };
       onEditOutfit(updatedOutfit);
-    } else if (selectedItems.length > 0) {
+    } else {
+      // Only create outfit when button is pressed and required items are present
+      if (!hasRequiredItems()) {
+        setFeedbackMessage("Please select at least one Upper Body, Lower Body, and Shoes item");
+        return;
+      }
+
       onAddOutfit({
         title: title || generateDefaultTitle(),
         items: selectedItems,
-        icon: selectedIcon
+        icon: selectedIcon || DEFAULT_ICON
       });
+      
+      // Reset form after creating outfit
       setTitle("");
       setSelectedItems([]);
-      setSelectedIcon(DEFAULT_ICON);
+      setSelectedIcon(null);
+      setFeedbackMessage("Outfit created successfully!");
     }
   };
 
@@ -198,7 +215,7 @@ export function AddOutfitForm({
                   <button
                     type="button"
                     onClick={() => {
-                      setSelectedIcon(DEFAULT_ICON);
+                      setSelectedIcon(null);
                       setShowIconUpload(false);
                     }}
                     className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
