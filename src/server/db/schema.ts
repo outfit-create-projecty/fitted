@@ -128,6 +128,20 @@ export const clothingItemsOutfitsRelations = relations(clothingItemsOutfits, ({ 
   outfit: one(outfits, { fields: [clothingItemsOutfits.outfitId], references: [outfits.id] }),
 }));
 
+export const outfitFeedback = createTable("outfit_feedback", (d) => ({
+  id: d.varchar({ length: 255 }).notNull().primaryKey().$defaultFn(() => crypto.randomUUID()),
+  outfitId: d.varchar({ length: 255 }).notNull().references(() => outfits.id),
+  userId: d.varchar({ length: 255 }).notNull().references(() => users.id),
+  rating: d.integer().notNull(),
+  comment: d.varchar({ length: 4096 }),
+  createdAt: d.timestamp().notNull().$defaultFn(() => new Date()),
+}));
+
+export const outfitFeedbackRelations = relations(outfitFeedback, ({ one }) => ({
+  outfit: one(outfits, { fields: [outfitFeedback.outfitId], references: [outfits.id] }),
+  user: one(users, { fields: [outfitFeedback.userId], references: [users.id] }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type ClothingItem = typeof clothingItems.$inferSelect;
 export type Outfit = typeof outfits.$inferSelect;
