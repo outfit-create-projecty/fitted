@@ -7,7 +7,7 @@ import Footer from "@/components/footer";
 export default async function () {
     const session = await auth();
 
-    if(session?.user) return redirect("/profile");
+    if(session?.user) return redirect("/wardrobe");
 
     return (<main className="h-full flex flex-col">
         <Navigation user={session?.user} />
