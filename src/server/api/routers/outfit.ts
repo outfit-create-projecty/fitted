@@ -17,7 +17,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return dotProduct / (magnitudeA * magnitudeB);
 }
 
-const prompt = "You are a fashion expert. I have a client that is trying to create an outfit for their specific prompt. Please return a list of stylistic tags in JSON format that describe the outfit. Please respond in the following format: { tags: string[] }";
+const prompt = "You are a fashion expert. I have a client that is trying to create an outfit for their specific prompt. Please return a list of stylistic tags in JSON format that describe the outfit. If the prompt mentions specific accessories (like 'add a watch' or 'include a necklace'), include tags that would match with those specific accessories. Please respond in the following format: { tags: string[], includeAccessories: boolean, requestedAccessories: string[] }";
 export const outfitRouter = createTRPCRouter({
   list: protectedProcedure
     .input(z.object({ userId: z.string() }))
@@ -92,7 +92,7 @@ export const outfitRouter = createTRPCRouter({
         response_format: { type: "json_object" },
       });
 
-      const { tags } = JSON.parse(outfit.choices[0]?.message?.content ?? "{}");
+      const { tags, includeAccessories, requestedAccessories } = JSON.parse(outfit.choices[0]?.message?.content ?? "{}");
       if(!tags) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No tags found" });
       }
@@ -124,7 +124,54 @@ export const outfitRouter = createTRPCRouter({
       }
 
       const avg = (top.score + bottom.score + shoes.score) / 3;
-      const misc =  sortedOutfitItems.filter((item) => item.item.classification === "misc" && item.score > avg).slice(0, 3);
+      
+      // Refined misc item selection logic
+      let misc = [];
+      
+      // Check if specific accessories are requested
+      const hasSpecificAccessoryRequest = requestedAccessories && requestedAccessories.length > 0;
+      
+      if (hasSpecificAccessoryRequest) {
+        // If specific accessories are requested, prioritize those types
+        for (const requestedAccessory of requestedAccessories) {
+          // Find the best matching misc item for each requested accessory type
+          const matchingItems = sortedOutfitItems.filter(item => 
+            item.item.classification === "misc" && 
+            item.item.name.toLowerCase().includes(requestedAccessory.toLowerCase())
+          );
+          
+          if (matchingItems.length > 0) {
+            // Add the best matching item for this accessory type
+            misc.push(matchingItems[0]);
+          }
+        }
+        
+        // If we couldn't find exact matches, try to find similar items
+        if (misc.length === 0) {
+          // Look for misc items with high scores that might be similar to requested accessories
+          const similarItems = sortedOutfitItems.filter(item => 
+            item.item.classification === "misc" && 
+            item.score > avg * 0.8
+          ).slice(0, 3);
+          
+          misc = similarItems;
+        }
+      } else if (includeAccessories || description.toLowerCase().includes("accessor")) {
+        // If general accessories are requested but not specific ones
+        // Use a moderate threshold to include a few well-matching accessories
+        const moderateThreshold = avg * 0.8; // 80% of the average score
+        misc = sortedOutfitItems.filter((item) => 
+          item.item.classification === "misc" && 
+          item.score > moderateThreshold
+        ).slice(0, 3);
+      } else {
+        // Original logic for when accessories aren't specifically requested
+        // Only include accessories that match very well with the outfit
+        misc = sortedOutfitItems.filter((item) => 
+          item.item.classification === "misc" && 
+          item.score > avg
+        ).slice(0, 2);
+      }
 
       const score = (top.score + bottom.score + shoes.score) / (3 + misc.length);
 
