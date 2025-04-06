@@ -19,7 +19,7 @@ export default async function About() {
                             Fitted was established in 2025 to give users an easier way to style themselves. Our mission is to simplify the process of creating outfits by providing a digital wardrobe and outfit creation platform. We understand that choosing what to wear can be a daily challenge, and our goal is to make this process more enjoyable and efficient.
                         </p>
                         <p className="font-normal text-xl text-black leading-relaxed mt-6">
-                            Our platform allows users to upload their clothing items, organize them by category, and create outfits for various occasions. Whether you're preparing for a job interview, a date, or just your daily activities, Fitted helps you make confident fashion choices.
+                            Our platform allows users to upload their clothing items, organize them by category, and create outfits for various occasions. Whether you&apos;re preparing for a job interview, a date, or just your daily activities, Fitted helps you make confident fashion choices.
                         </p>
                         <p className="font-normal text-xl text-black leading-relaxed mt-6">
                             We believe that everyone deserves to feel confident in what they wear, and our technology is designed to make that possible. By combining user preferences with our outfit creation algorithms, we provide personalized style recommendations that match your taste and the occasion.
