@@ -29,7 +29,7 @@ export function LoginBox() {
             <input type="hidden" name="csrfToken" value={csrfToken}></input>
             {Object.keys(providers).length > 0 ? Object.values(providers as NonNullable<Awaited<ReturnType<typeof getProviders>>>).map(provider => (
                 <Button
-                    onClick={() => signIn(provider.id, { redirectTo: "/profile" })}
+                    onClick={() => signIn(provider.id, { redirectTo: "/wardrobe" })}
                     key={provider.id}
                     className="mb-2 w-64 flex items-center gap-2"
                 >
