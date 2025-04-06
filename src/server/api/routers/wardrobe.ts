@@ -4,7 +4,7 @@ import { clothingItems, outfits } from "~/server/db/schema";
 import OpenAI from "openai";
 import { env } from "~/env";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { eq, or } from "drizzle-orm";
+import { eq, or, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 const openai = new OpenAI({
@@ -127,5 +127,36 @@ export const wardrobeRouter = createTRPCRouter({
         .where(eq(clothingItems.id, input.id));
 
       return { success: true };
+    }),
+
+  updateStatus: protectedProcedure
+    .input(
+      z.object({
+        itemId: z.string(),
+        status: z.enum(["available", "unavailable"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { itemId, status } = input;
+
+      const item = await ctx.db
+        .update(clothingItems)
+        .set({ status })
+        .where(
+          and(
+            eq(clothingItems.id, itemId),
+            eq(clothingItems.userId, ctx.session.user.id)
+          )
+        )
+        .returning();
+
+      if (!item.length) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Item not found",
+        });
+      }
+
+      return item[0];
     }),
 }); 

@@ -94,6 +94,7 @@ export const clothingItems = createTable("clothing_item", (d) => ({
   image: d.varchar({ length: 255 }).notNull(),
   userId: d.varchar({ length: 255 }).notNull().references(() => users.id),
   tagsVector: d.vector({ dimensions: 1536 }).notNull(),
+  status: d.varchar({ length: 255 }).notNull().default("available"),
 }));
 
 export const clothingItemsRelations = relations(clothingItems, ({ one }) => ({

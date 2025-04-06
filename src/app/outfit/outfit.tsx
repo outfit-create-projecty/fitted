@@ -28,7 +28,7 @@ export default function OutfitClient({ user }: { user: User }) {
         if (!finalPrompt.trim()) return;
         setIsGenerating(true);
         try {
-            const result = await createOutfit.mutateAsync({ prompt: finalPrompt });
+            const result = await createOutfit.mutateAsync({ description: finalPrompt });
             if (result) {
                 toast({
                     title: "Success",

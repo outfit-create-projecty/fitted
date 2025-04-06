@@ -2,25 +2,14 @@
 
 import { api } from "~/trpc/react";
 import Link from "next/link";
+import type { TRPCClientErrorLike } from "@trpc/client";
 import type { ClothingItem, User } from "~/server/db/schema";
 import { useState } from "react";
-
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "~/app/components/ui/alert-dialog";
-import { Button } from "~/app/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Shirt, ShirtIcon } from "lucide-react";
 import { useToast } from "~/app/components/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/app/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "~/app/components/ui/sheet";
+import { Button } from "~/app/components/ui/button";
 
 type Category = "all" | "tops" | "bottoms" | "misc";
 
@@ -29,7 +18,7 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
     const [currentCategory, setCurrentCategory] = useState<Category>("all");
     const [selectedItem, setSelectedItem] = useState<ClothingItem | null>(null);
 
-    const { data: wardrobeItems, refetch } = api.wardrobe.list.useQuery(undefined, {
+    const { data: wardrobeItems, refetch: refetchWardrobe } = api.wardrobe.list.useQuery(undefined, {
         initialData: initialWardrobeItems,
     });
 
@@ -38,9 +27,9 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
         return item.classification === currentCategory;
     });
 
-    const { mutate: deletePiece } = api.wardrobe.deletePiece.useMutation({
+    const { mutate: deletePiece, isPending: isDeleting } = api.wardrobe.deletePiece.useMutation({
         onSuccess: () => {
-            void refetch();
+            void refetchWardrobe();
             toast({
                 title: "Success",
                 description: "Your item has been deleted from your wardrobe.",
@@ -50,10 +39,29 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
         },
     });
 
+    const { mutate: updateStatus, isPending: isUpdatingStatus } = api.wardrobe.updateStatus.useMutation({
+        onError: (error: TRPCClientErrorLike<any>) => {
+            toast({
+                title: "Error",
+                description: error.message,
+                variant: "destructive",
+            });
+        },
+    });
+
     const handleDelete = (item: ClothingItem) => {
         deletePiece({
             id: item.id,
             userId: user.id,
+        });
+    };
+
+    const handleStatusToggle = (item: ClothingItem, e: React.MouseEvent) => {
+        e.stopPropagation();
+        item.status = item.status === "available" ? "unavailable" : "available";
+        updateStatus({
+            itemId: item.id,
+            status: item.status as "available" | "unavailable"
         });
     };
 
@@ -102,7 +110,7 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
                         {filteredItems?.map((item: ClothingItem) => (
                             <div
                                 key={item.id}
-                                className="relative aspect-square border rounded-lg overflow-hidden group cursor-pointer flex items-center justify-center"
+                                className="relative aspect-square border rounded-lg overflow-hidden group flex items-center justify-center"
                                 onClick={() => setSelectedItem(item)}
                             >
                                 <img
@@ -110,15 +118,33 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
                                     alt={item.name}
                                     className="object-cover !z-50"
                                 />
+                                { item.status !== "available" && (
+                                    <div className="w-full h-full bg-gray-500/70 absolute inset-0 !z-50"></div>
+                                )}
                                 <div className="w-full h-full bg-white absolute inset-0 !z-40"></div>
                                 <div className="absolute inset-0 !z-60 bg-opacity-0 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                    <div className="absolute bottom-0 h-13 w-full bg-black p-2 px-4 flex items-center">
-                                        <p className="text-md text-white tracking-wide max-w-[80%] truncate">{item.name}</p>
+                                    <div className="absolute bottom-0 h-13 w-full bg-black p-2 px-4 flex items-center hover:cursor-pointer">
+                                        <p className="text-md text-white tracking-wide max-w-[60%] truncate">{item.name}</p>
                                     </div>
-                                    <div className="absolute bottom-2 right-2">
+                                    <div className="absolute bottom-2 right-2 flex items-center gap-2 hover:cursor-pointer">
+                                        <Button
+                                            variant={item.status === "available" ? "default" : "destructive"}
+                                            size="icon"
+                                            className="hover:cursor-pointer"
+                                            disabled={isUpdatingStatus}
+                                            onClick={(e) => handleStatusToggle(item, e)}
+                                        >
+                                            {item.status === "available" ? (
+                                                <Shirt className="h-4 w-4" />
+                                            ) : (
+                                                <ShirtIcon className="h-4 w-4" />
+                                            )}
+                                        </Button>
                                         <Button
                                             variant="destructive"
                                             size="icon"
+                                            className="hover:cursor-pointer"
+                                            disabled={isDeleting}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleDelete(item);
