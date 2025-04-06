@@ -110,6 +110,7 @@ export const outfits = createTable("outfit", (d) => ({
   miscIds: d.varchar({ length: 255 }).array(),
   shoesId: d.varchar({ length: 255 }).references(() => clothingItems.id),
   userId: d.varchar({ length: 255 }).notNull().references(() => users.id),
+  score: d.numeric(),
 }));
 
 export const outfitsRelations = relations(outfits, ({ one, many }) => ({

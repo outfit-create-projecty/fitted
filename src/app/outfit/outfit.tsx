@@ -17,7 +17,8 @@ export default function OutfitClient({ user }: { user: User }) {
         bottom: ClothingItem,
         misc: ClothingItem[],
         shoes: ClothingItem,
-        id?: string
+        score: string,
+        id: string
     } | null>(null);
     const createOutfit = api.outfit.create.useMutation();
     const { toast } = useToast();
@@ -95,7 +96,8 @@ export default function OutfitClient({ user }: { user: User }) {
                         <div className="mt-8 p-6 border rounded-lg bg-gray-50">
                             <h2 className="text-xl font-semibold mb-2">{generatedOutfit.name}</h2>
                             <p className="text-gray-600 mb-4">{generatedOutfit.description}</p>
-                            
+                            <p className="text-gray-600 mb-4">Score: {generatedOutfit.score}</p>
+
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 {generatedOutfit.top && (
                                     <div 

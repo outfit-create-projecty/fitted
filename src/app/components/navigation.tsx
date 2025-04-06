@@ -22,7 +22,7 @@ export default function Navigation(props: { user ?: Session['user'] }) {
     const user = props.user;
     const router = useRouter();
 
-    return (<nav className="fixed w-full !z-50 border-none bg-black shadow-md p-4 flex justify-between items-center border-b-2 border-m-primary-dark">
+    return (<nav className="fixed w-full !z-90 border-none bg-black shadow-md p-4 flex justify-between items-center border-b-2 border-m-primary-dark">
         <Button variant="ghost" onClick={() => router.push("/")}>
             <span className="text-xl font-bold text-ultralight">ProjectY</span>
         </Button>

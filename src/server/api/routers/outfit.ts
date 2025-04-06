@@ -11,14 +11,6 @@ const openai = new OpenAI({
   apiKey: env.OPENAI_API_KEY,
 });
 
-const s3Client = new S3Client({
-  region: "us-east-2",
-  credentials: {
-    accessKeyId: env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-  },
-});
-
 function cosineSimilarity(a: number[], b: number[]): number {
   const dotProduct = a.reduce((sum, value, index) => sum + value * (b[index] ?? 0), 0);
   const magnitudeA = Math.sqrt(a.reduce((sum, value) => sum + value * value, 0));
@@ -75,10 +67,13 @@ export const outfitRouter = createTRPCRouter({
       const bottom = sortedOutfitItems.find((item) => item.item.classification === "bottom");
       const shoes = sortedOutfitItems.find((item) => item.item.classification === "shoes");
       const misc =  sortedOutfitItems.filter((item) => item.item.classification === "misc").slice(0, 3);
+      console.log(misc.map((item) => item.score))
       
       if(!top || !bottom || !shoes) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No outfit items found" });
       }
+
+      const score = (top.score + bottom.score + shoes.score + misc.reduce((acc, item) => acc + item.score, 0)) / (3 + misc.length);
 
       const createdOutfit = {
         top: top.item,
@@ -121,10 +116,15 @@ export const outfitRouter = createTRPCRouter({
         miscIds: misc.map((item) => item.item.id),
         userId: ctx.session.user.id,
         prompt: input.prompt,
+        score: score.toString(),
       }).returning();
 
+      if(!insertedOutfit[0]) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to create outfit" });
+      }
+
       return {
-        id: insertedOutfit[0]?.id,
+        id: insertedOutfit[0].id,
         name,
         description,
         top: top.item,
@@ -132,6 +132,7 @@ export const outfitRouter = createTRPCRouter({
         shoes: shoes.item,
         misc: misc.map((item) => item.item),
         prompt: input.prompt,
+        score: score.toString(),
       };
     }),
 

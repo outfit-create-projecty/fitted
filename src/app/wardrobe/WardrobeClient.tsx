@@ -58,24 +58,24 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
     };
 
     return (
-        <div className="w-full bg-secondary min-h-[calc(100vh-156px)] p-16">
+        <div className="w-full bg-accent-light min-h-[calc(100vh-156px)] p-16">
             <div className="flex justify-between items-center mb-6 w-full">
-                <h1 className="text-3xl font-bold">Your Wardrobe</h1>
+                <h1 className="text-5xl py-4 font-extrabold text-black">Your Wardrobe</h1>
                 <Link
                     href="/add"
-                    className="ml-auto px-4 py-2 bg-blue-500 text-primary-foreground rounded hover:bg-blue-600"
+                    className="ml-auto px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
                 >
                     Add New Piece
                 </Link>
             </div>
 
             <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setCurrentCategory(value as Category)}>
-                <TabsList className="mb-4 w-96">
-                    <TabsTrigger value="all" className="w-24">All</TabsTrigger>
-                    <TabsTrigger value="top" className="w-24">Tops</TabsTrigger>
-                    <TabsTrigger value="bottom" className="w-24">Bottoms</TabsTrigger>
-                    <TabsTrigger value="shoes" className="w-24">Shoes</TabsTrigger>
-                    <TabsTrigger value="misc" className="w-24">Misc</TabsTrigger>
+                <TabsList className="mb-4 w-[40vw] bg-primary-foreground">
+                    <TabsTrigger value="all" className="w-[8vw]">All</TabsTrigger>
+                    <TabsTrigger value="top" className="w-[8vw]">Tops</TabsTrigger>
+                    <TabsTrigger value="bottom" className="w-[8vw]">Bottoms</TabsTrigger>
+                    <TabsTrigger value="shoes" className="w-[8vw]">Shoes</TabsTrigger>
+                    <TabsTrigger value="misc" className="w-[8vw]">Misc</TabsTrigger>
                 </TabsList>
 
                 {filteredItems?.length === 0 ? (
@@ -99,15 +99,16 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
                         {filteredItems?.map((item: ClothingItem) => (
                             <div
                                 key={item.id}
-                                className="relative aspect-square border rounded-lg overflow-hidden group cursor-pointer"
+                                className="relative aspect-square border rounded-lg overflow-hidden group cursor-pointer flex items-center justify-center"
                                 onClick={() => setSelectedItem(item)}
                             >
                                 <img
                                     src={`https://d2fz44w91whf0y.cloudfront.net/${user.id}/${item.id}`}
                                     alt={item.name}
-                                    className="object-cover"
+                                    className="object-cover !z-50"
                                 />
-                                <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200">
+                                <div className="w-full h-full bg-white absolute inset-0 !z-40"></div>
+                                <div className="absolute inset-0 !z-60 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200">
                                     <div className="absolute bottom-2 right-2">
                                         <Button
                                             variant="destructive"
