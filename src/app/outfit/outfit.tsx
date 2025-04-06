@@ -162,7 +162,7 @@ export default function OutfitClient({ user }: { user: User }) {
                             </div>
 
                             {/* Feedback Section */}
-                            <div className="mt-6 border-t pt-6">
+                            <div className="text-black mt-6 border-t pt-6">
                                 <h3 className="text-lg font-medium mb-4 text-black">Want to modify this outfit?</h3>
                                 <p className="text-sm text-gray-600 mb-4">
                                     Tell us what you'd like to change about the outfit. For example:
