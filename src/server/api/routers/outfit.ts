@@ -89,14 +89,15 @@ export const outfitRouter = createTRPCRouter({
       const top = sortedOutfitItems.find((item) => item.item.classification === "top");
       const bottom = sortedOutfitItems.find((item) => item.item.classification === "bottom");
       const shoes = sortedOutfitItems.find((item) => item.item.classification === "shoes");
-      const misc =  sortedOutfitItems.filter((item) => item.item.classification === "misc").slice(0, 3);
-      console.log(misc.map((item) => item.score))
       
       if(!top || !bottom || !shoes) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No outfit items found" });
       }
+      
+      const avg = (top.score + bottom.score + shoes.score) / 3;
+      const misc =  sortedOutfitItems.filter((item) => item.item.classification === "misc" && item.score > avg).slice(0, 3);
 
-      const score = (top.score + bottom.score + shoes.score + misc.reduce((acc, item) => acc + item.score, 0)) / (3 + misc.length);
+      const score = (top.score + bottom.score + shoes.score) / (3 + misc.length);
 
       const createdOutfit = {
         top: top.item,

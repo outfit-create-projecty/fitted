@@ -30,13 +30,6 @@ export default function OutfitClient({ user }: { user: User }) {
         try {
             const result = await createOutfit.mutateAsync({ description: finalPrompt });
             if (result) {
-                toast({
-                    title: "Success",
-                    description: "Your outfit has been generated successfully",
-                    className: "bg-green-300",
-                    duration: 2000,
-                });
-
                 setGeneratedOutfit(result);
                 setFeedback(""); // Clear feedback after regeneration
             }
@@ -91,9 +84,8 @@ export default function OutfitClient({ user }: { user: User }) {
 
                     {generatedOutfit && (
                         <div className="mt-8 p-6 border rounded-lg bg-gray-50">
-                            <h2 className="text-xl font-semibold mb-2">{generatedOutfit.name}</h2>
+                            <h2 className="text-2xl font-bold mb-2 flex flex-row items-center text-black gap-2">{generatedOutfit.name} <span className="ml-auto text-sm text-gray-500">({Math.round(Number(generatedOutfit.score) * 100)}% match)</span></h2>
                             <p className="text-gray-600 mb-4">{generatedOutfit.description}</p>
-                            <p className="text-gray-600 mb-4">Score: {generatedOutfit.score}</p>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 {generatedOutfit.top && (
@@ -108,7 +100,7 @@ export default function OutfitClient({ user }: { user: User }) {
                                                 className="object-cover rounded-lg"
                                             />
                                         </div>
-                                        <h3 className="font-medium">Top</h3>
+                                        <h3 className="font-medium text-black">Top</h3>
                                         <p className="text-sm text-gray-600">{generatedOutfit.top.name}</p>
                                     </div>
                                 )}
@@ -124,7 +116,7 @@ export default function OutfitClient({ user }: { user: User }) {
                                                 className="object-cover rounded-lg"
                                             />
                                         </div>
-                                        <h3 className="font-medium">Bottom</h3>
+                                        <h3 className="font-medium text-black">Bottom</h3>
                                         <p className="text-sm text-gray-600">{generatedOutfit.bottom.name}</p>
                                     </div>
                                 )}
@@ -140,7 +132,7 @@ export default function OutfitClient({ user }: { user: User }) {
                                                 className="object-cover rounded-lg"
                                             />
                                         </div>
-                                        <h3 className="font-medium">Shoes</h3>
+                                        <h3 className="font-medium text-black">Shoes</h3>
                                         <p className="text-sm text-gray-600">{generatedOutfit.shoes.name}</p>
                                     </div>
                                 )}
@@ -157,7 +149,7 @@ export default function OutfitClient({ user }: { user: User }) {
                                                 className="object-cover rounded-lg"
                                             />
                                         </div>
-                                        <h3 className="font-medium">{item.classification}</h3>
+                                        <h3 className="font-mediumtext-black">Miscellaneous</h3>
                                         <p className="text-sm text-gray-600">{item.name}</p>
                                     </div>
                                 ))}
@@ -165,7 +157,7 @@ export default function OutfitClient({ user }: { user: User }) {
 
                             {/* Feedback Section */}
                             <div className="mt-6 border-t pt-6">
-                                <h3 className="text-lg font-medium mb-4">Want to modify this outfit?</h3>
+                                <h3 className="text-lg font-medium mb-4 text-black">Want to modify this outfit?</h3>
                                 <p className="text-sm text-gray-600 mb-4">
                                     Tell us what you'd like to change about the outfit. For example:
                                     "Make it more casual", "Use a different color scheme", or "Add more accessories"
