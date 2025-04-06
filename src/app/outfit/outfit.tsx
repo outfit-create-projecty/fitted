@@ -4,6 +4,7 @@ import type { ClothingItem, Outfit, User } from "~/server/db/schema";
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useToast } from "../components/hooks/use-toast";
+import WeatherInfo from "../components/weather-info";
 
 export default function OutfitClient({ user }: { user: User }) {
     const [prompt, setPrompt] = useState("");
@@ -57,6 +58,11 @@ export default function OutfitClient({ user }: { user: User }) {
         <div className="w-fullcontainer px-4 py-8 min-h-[calc(100vh-72px)] bg-primary-ultradark">
             <div className="max-w-2xl mx-auto my-32">
                 <h1 className="text-6xl font-extrabold mb-6 text-center text-green-100">Generate Your Outfit</h1>
+                
+                {/* Weather Information */}
+                <div className="mb-8">
+                    <WeatherInfo />
+                </div>
                 
                 <div className="space-y-4">
                     <div>
