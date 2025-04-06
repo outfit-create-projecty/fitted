@@ -117,13 +117,13 @@ export default function Wardrobe({ user }: { user: User }) {
                         <div className="flex gap-4 justify-center">
                             <button
                                 onClick={handleNewUpload}
-                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                className="px-4 py-2 bg-blue-500 text-primary-foreground rounded hover:bg-blue-600"
                             >
                                 Upload Another Piece
                             </button>
                             <Link
                                 href="/wardrobe"
-                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                className="px-4 py-2 bg-green-500 text-primary-foreground rounded hover:bg-green-600"
                             >
                                 View Wardrobe
                             </Link>

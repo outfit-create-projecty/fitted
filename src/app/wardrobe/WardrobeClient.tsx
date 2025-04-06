@@ -58,12 +58,12 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
     };
 
     return (
-        <div className="w-full min-h-[calc(100vh-156px)] p-16">
+        <div className="w-full bg-secondary min-h-[calc(100vh-156px)] p-16">
             <div className="flex justify-between items-center mb-6 w-full">
                 <h1 className="text-3xl font-bold">Your Wardrobe</h1>
                 <Link
                     href="/add"
-                    className="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    className="ml-auto px-4 py-2 bg-blue-500 text-primary-foreground rounded hover:bg-blue-600"
                 >
                     Add New Piece
                 </Link>
@@ -79,14 +79,14 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
 
                 {filteredItems?.length === 0 ? (
                     <div className="text-center py-8">
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-primary-foreground mb-4">
                             {currentCategory === "all" 
                                 ? "Your wardrobe is empty" 
                                 : `No ${currentCategory} in your wardrobe`}
                         </p>
                         <Link
                             href="/add"
-                            className="text-blue-500 hover:text-blue-600"
+                            className="text-blue-600 hover:text-blue-600"
                         >
                             {currentCategory === "all" 
                                 ? "Add your first piece" 

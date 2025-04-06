@@ -4,7 +4,6 @@ import type { ClothingItem, Outfit, User } from "~/server/db/schema";
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useToast } from "../components/hooks/use-toast";
-import Image from "next/image";
 
 export default function OutfitClient({ user }: { user: User }) {
     const [prompt, setPrompt] = useState("");
@@ -48,7 +47,7 @@ export default function OutfitClient({ user }: { user: User }) {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8 min-h-[calc(100vh-144px)]">
+        <div className="w-fullcontainer px-4 py-8 min-h-[calc(100vh-72px)] bg-secondary">
             <div className="max-w-2xl mx-auto">
                 <h1 className="text-3xl font-bold mb-6">Generate Your Outfit</h1>
                 
@@ -70,10 +69,10 @@ export default function OutfitClient({ user }: { user: User }) {
                     <button
                         onClick={generateOutfit}
                         disabled={isGenerating || !prompt.trim()}
-                        className={`w-full py-2 px-4 rounded-lg text-white font-medium ${
+                        className={`w-full py-2 px-4 rounded-lg text-primary-foreground font-medium ${
                             isGenerating || !prompt.trim()
                                 ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-blue-600 hover:bg-blue-700"
+                                : "bg-primary hover:bg-secondary"
                         }`}
                     >
                         {isGenerating ? "Generating..." : "Generate Outfit"}

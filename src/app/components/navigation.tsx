@@ -22,21 +22,24 @@ export default function Navigation(props: { user ?: Session['user'] }) {
     const user = props.user;
     const router = useRouter();
 
-    return (<nav className="fixed w-full !z-50 bg-white text-m-white shadow-md p-4 flex justify-between items-center border-b-2 border-m-primary-dark">
+    return (<nav className="fixed w-full !z-50 border-none bg-black shadow-md p-4 flex justify-between items-center border-b-2 border-m-primary-dark">
         <Button variant="ghost" onClick={() => router.push("/")}>
-            <span className="text-xl font-bold">ProjectY</span>
+            <span className="text-xl font-bold text-ultralight">ProjectY</span>
         </Button>
 
         <div className="hidden md:flex gap-6 ml-auto mr-8">
-            <Button variant="link" className="text-m-black">
+            <Button variant="link" className="text-white">
                 <Link href="/outfit">Create an Outfit</Link>
             </Button>
-            <Button variant="link" className="text-m-black">
+            <Button variant="link" className="text-white">
+                <Link href="/add">Add to Wardrobe</Link>
+            </Button>
+            <Button variant="link" className="text-white">
                 <Link href="/wardrobe">View Wardrobe</Link>
             </Button>
             { user ? <DropdownMenu modal={false}>
                     <DropdownMenuTrigger>
-                    <Avatar className="size-8">
+                    <Avatar className="size-8 bg-white">
                         <AvatarImage src="default.png" />
                         <AvatarFallback>You</AvatarFallback>
                     </Avatar>
@@ -58,7 +61,7 @@ export default function Navigation(props: { user ?: Session['user'] }) {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu> : <Button>
-                <Link href="/login" className="text-m-white">Login</Link>
+                <Link href="/login" className="text-primary-foreground">Login</Link>
             </Button> }
         </div>
     </nav>);
