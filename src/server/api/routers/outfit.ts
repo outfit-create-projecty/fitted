@@ -20,6 +20,21 @@ function cosineSimilarity(a: number[], b: number[]): number {
 
 const prompt = "You are a fashion expert. I have a client that is trying to create an outfit for their specific prompt. Please return a list of stylistic tags in JSON formatthat describe the outfit. Please respond in the following format: { tags: string[] }";
 export const outfitRouter = createTRPCRouter({
+  list: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const allOutfits = await ctx.db.query.outfits.findMany({
+        where: eq(outfits.userId, input.userId),
+        with: {
+          top: true,
+          bottom: true,
+          shoes: true,
+        },
+      });
+
+      return allOutfits;
+    }),
+
   create: protectedProcedure
     .input(
       z.object({
@@ -93,7 +108,7 @@ export const outfitRouter = createTRPCRouter({
       if(!top || !bottom || !shoes) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No outfit items found" });
       }
-      
+
       const avg = (top.score + bottom.score + shoes.score) / 3;
       const misc =  sortedOutfitItems.filter((item) => item.item.classification === "misc" && item.score > avg).slice(0, 3);
 

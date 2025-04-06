@@ -17,22 +17,26 @@ import {
 
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { WashingMachine } from "lucide-react";
 
 export default function Navigation(props: { user ?: Session['user'] }) {
     const user = props.user;
     const router = useRouter();
 
     return (<nav className="fixed w-full !z-90 border-none bg-black shadow-md p-4 flex justify-between items-center border-b-2 border-m-primary-dark">
-        <Button variant="ghost" onClick={() => router.push("/")}>
-            <span className="text-xl font-bold text-ultralight">ProjectY</span>
+        <Button variant="ghost" className="hover:cursor-pointer hover:bg-transparent" onClick={() => router.push("/")}>
+            <span className="text-3xl font-bold text-ultralight flex flex-row items-center"><WashingMachine className="size-6" /> Fit<span className="text-primary">ted</span></span>
         </Button>
 
         <div className="hidden md:flex gap-6 ml-auto mr-8">
             <Button variant="link" className="text-white">
-                <Link href="/outfit">Create an Outfit</Link>
+                <Link href="/outfit">Create Outfit</Link>
             </Button>
             <Button variant="link" className="text-white">
-                <Link href="/add">Add to Wardrobe</Link>
+                <Link href="/all">All Outfits</Link>
+            </Button>
+            <Button variant="link" className="text-white">
+                <Link href="/add">Add Clothes</Link>
             </Button>
             <Button variant="link" className="text-white">
                 <Link href="/wardrobe">View Wardrobe</Link>

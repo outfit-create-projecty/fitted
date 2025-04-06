@@ -148,4 +148,4 @@ export const outfitFeedbackRelations = relations(outfitFeedback, ({ one }) => ({
 
 export type User = typeof users.$inferSelect;
 export type ClothingItem = typeof clothingItems.$inferSelect;
-export type Outfit = typeof outfits.$inferSelect;
+export type Outfit = typeof outfits.$inferSelect & { top: ClothingItem, bottom: ClothingItem, shoes: ClothingItem, misc: ClothingItem[] };
