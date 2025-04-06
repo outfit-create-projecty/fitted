@@ -105,7 +105,7 @@ export default function AllOutfits({ user }: { user: User }) {
                         />
                     </div>
                     <Select onValueChange={(value) => setSortBy(value)}>
-                        <SelectTrigger className="w-40 bg-white/40 text-black font-medium rounded-xl">
+                        <SelectTrigger className="w-40 bg-white/40 text-black font-medium rounded-xl cursor-pointer">
                             <SelectValue placeholder="Sort by" />
                         </SelectTrigger>
                         <SelectContent>
@@ -121,17 +121,18 @@ export default function AllOutfits({ user }: { user: User }) {
                 {filteredOutfits.map((outfit) => (
                     <div
                         key={outfit.id}
-                        className="bg-white p-8 relative aspect-square border rounded-lg overflow-hidden group flex flex-col gap-4 items-center justify-center cursor-pointer hover:shadow-lg transition-shadow"
+                        className="bg-white p-8 relative aspect-square rounded-lg overflow-hidden group flex flex-col gap-4 items-center justify-center cursor-pointer"
                         onClick={() => setSelectedOutfit(outfit as Outfit)}
                     >
                         <h1 className="text-3xl font-bold text-black w-full">{outfit.name}</h1>
                         <p className="text-md text-black overflow-ellipsis h-1/3 overflow-hidden w-full">{outfit.description}</p>
                         <div className="flex items-center w-full gap-1 mt-auto">
                             <p className="text-md text-gray-950 font-medium mr-auto">{Math.round(Number(outfit.score) * 100)}%</p>
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <Star
-                                    key={star}
-                                    className={`h-5 w-5 cursor-pointer ${
+                            <div className="flex items-center gap-1 hover:scale-[1.05] duration-300 transition-transform">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                        key={star}
+                                        className={`h-5 w-5 cursor-pointer hover:scale-[1.25] duration-200 transition-transform  ${
                                         star <= (outfit.rating)
                                             ? "fill-yellow-400 text-yellow-400"
                                             : "text-gray-300"
@@ -142,6 +143,7 @@ export default function AllOutfits({ user }: { user: User }) {
                                     }}
                                 />
                             ))}
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -199,7 +201,7 @@ export default function AllOutfits({ user }: { user: User }) {
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <Star
                                             key={star}
-                                            className={`h-6 w-6 cursor-pointer ${
+                                            className={`h-6 w-6 cursor-pointer hover:scale-[1.25] duration-200 transition-transform ${
                                                 star <= (selectedOutfit.rating ?? 0)
                                                     ? "fill-yellow-400 text-yellow-400"
                                                     : "text-gray-300"
@@ -210,7 +212,7 @@ export default function AllOutfits({ user }: { user: User }) {
                                     </div>
                                 </div>
                                 <div className="ml-auto mt-auto">
-                                    <Button variant="destructive" size="icon" onClick={() => handleDelete(selectedOutfit)}><Trash2 size="icon" /></Button>
+                                    <Button variant="destructive" size="icon" className="hover:scale-[1.05] duration-200 transition-transform cursor-pointer" onClick={() => handleDelete(selectedOutfit)}><Trash2 size="icon" /></Button>
                                 </div>
                             </div>
                         </>
