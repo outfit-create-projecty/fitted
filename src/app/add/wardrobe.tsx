@@ -109,7 +109,7 @@ export default function Wardrobe({ user }: { user: User }) {
 
     return (
         <div className="w-full max-w-2xl p-6">
-            <h1 className="text-6xl font-bold mb-6 text-center">Add to Wardrobe</h1>
+            <h1 className="text-6xl font-bold mb-6 text-center border-b-2 border-gray-300 pb-2">Add to Wardrobe</h1>
             
             <div className="space-y-4">
                 {!uploadComplete ? (
@@ -144,8 +144,8 @@ export default function Wardrobe({ user }: { user: User }) {
                                     </div>
                                 ) : (
                                     <>
-                                        <p className="text-xl">Click to upload images</p>
-                                        <p className="text-md">or drag and drop multiple files</p>
+                                        <p className="text-xl text-white">Click to upload images</p>
+                                        <p className="text-md text-white">or drag and drop multiple files</p>
                                     </>
                                 )}
                             </div>
