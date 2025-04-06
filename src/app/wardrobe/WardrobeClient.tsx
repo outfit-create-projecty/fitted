@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from "~/app/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "~/app/components/ui/sheet";
 import { Button } from "~/app/components/ui/button";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "~/app/components/ui/hover-card";
+import { ScrollArea } from "../components/ui/scroll-area";
 type Category = "all" | "tops" | "bottoms" | "misc";
 
 export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobeItems: ClothingItem[], user: User }) {
@@ -181,7 +182,7 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
             <Sheet open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
                 <SheetContent className="p-8 pt-[100px]">
                     {selectedItem && (
-                        <>
+                        <ScrollArea className="h-[calc(100vh-110px)] pr-4">
                             <SheetHeader>
                                 <SheetTitle className="text-4xl font-bold pb-4">{selectedItem.name}</SheetTitle>
                                 <SheetDescription className="text-md">{selectedItem.description}</SheetDescription>
@@ -203,7 +204,7 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
                             </div>
-                        </>
+                        </ScrollArea>
                     )}
                 </SheetContent>
             </Sheet>

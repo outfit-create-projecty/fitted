@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { User } from "~/server/db/schema";
 import { api } from "~/trpc/react";
 import Link from "next/link";
@@ -12,12 +12,12 @@ export default function Wardrobe({ user }: { user: User }) {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [uploadComplete, setUploadComplete] = useState(false);
+    const [uploadCount, setUploadCount] = useState(0);
     const { toast } = useToast();
+
     const { mutate: addPiece } = api.wardrobe.addPiece.useMutation({
-        onSuccess: (data) => {
-            console.log("Upload successful:", data);
-            setUploadProgress(100);
-            setUploadComplete(true);
+        onSuccess: () => {
+            setUploadProgress(uploadProgress + 100 / uploadCount);
             toast({
                 title: "Success",
                 description: "Item added to wardrobe",
@@ -27,7 +27,6 @@ export default function Wardrobe({ user }: { user: User }) {
         },
         onError: (error) => {
             console.error("Upload failed:", error);
-            setIsUploading(false);
             toast({
                 title: "Error",
                 description: "Failed to add item",
@@ -36,7 +35,17 @@ export default function Wardrobe({ user }: { user: User }) {
         },
     });
 
+    useEffect(() => {
+        if (Math.round(uploadProgress) === 100) {
+            setUploadComplete(true);
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadCount(0);
+        }
+    }, [uploadProgress]);
+
     const handleFileUpload = async (files: FileList) => {
+        setUploadCount(files.length);
         setIsUploading(true);
         setUploadProgress(0);
         setUploadComplete(false);
@@ -73,8 +82,6 @@ export default function Wardrobe({ user }: { user: User }) {
 
         try {
             await Promise.all(uploadPromises);
-            setUploadProgress(100);
-            setUploadComplete(true);
         } catch (error) {
             console.error('Upload failed:', error);
             setIsUploading(false);
@@ -140,7 +147,7 @@ export default function Wardrobe({ user }: { user: User }) {
                                                 style={{ width: `${uploadProgress}%` }}
                                             ></div>
                                         </div>
-                                        <p>Uploading... {uploadProgress}%</p>
+                                        <p>Uploading... {Math.round(uploadProgress)}%</p>
                                     </div>
                                 ) : (
                                     <>

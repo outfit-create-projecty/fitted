@@ -8,7 +8,7 @@ import { Book, Compass, LogOut, Paperclip, Phone, Shirt, WashingMachine } from '
 export default function Footer(props: { user?: Session['user'] }) {
     return <div className="p-16 flex flex-row items-center justify-center h-72 bg-black text-primary-foreground gap-6 !z-50">
         <div className='flex flex-col w-[calc(40vw-32px)] h-full'>
-            <div className="flex flex-row items-center"><WashingMachine className="size-6" /><h1 className="text-3xl font-bold">Fit<span className="text-primary">ted</span></h1></div>
+            <div className="flex flex-row items-center"><WashingMachine className="size-6" /><span className="text-primary-foreground text-3xl font-bold">Fit</span><span className="text-secondary text-3xl font-bold">ted</span></div>
             <p className="text-sm font-light pr-16 pt-4">Choose your style.</p>
             <p className="mt-auto text-sm font-extralight">Copyright 2025 Fitted</p>
         </div>

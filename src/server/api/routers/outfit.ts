@@ -3,8 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { clothingItems, outfits } from "~/server/db/schema";
 import OpenAI from "openai";
 import { env } from "~/env";
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 const openai = new OpenAI({
@@ -18,7 +17,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return dotProduct / (magnitudeA * magnitudeB);
 }
 
-const prompt = "You are a fashion expert. I have a client that is trying to create an outfit for their specific prompt. Please return a list of stylistic tags in JSON formatthat describe the outfit. Please respond in the following format: { tags: string[] }";
+const prompt = "You are a fashion expert. I have a client that is trying to create an outfit for their specific prompt. Please return a list of stylistic tags in JSON format that describe the outfit. Please respond in the following format: { tags: string[] }";
 export const outfitRouter = createTRPCRouter({
   list: protectedProcedure
     .input(z.object({ userId: z.string() }))
