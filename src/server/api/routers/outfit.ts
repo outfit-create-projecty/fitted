@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { clothingItems, outfits, outfitFeedback } from "~/server/db/schema";
+import { clothingItems, outfits } from "~/server/db/schema";
 import OpenAI from "openai";
 import { env } from "~/env";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -46,7 +46,7 @@ export const outfitRouter = createTRPCRouter({
 
       const updatedOutfit = await ctx.db.update(outfits).set({
         rating,
-      }).where(eq(outfits.id, outfitId));
+      }).where(and(eq(outfits.id, outfitId), eq(outfits.userId, ctx.session.user.id)));
 
       return updatedOutfit;
     }),
@@ -188,5 +188,15 @@ export const outfitRouter = createTRPCRouter({
         prompt: description,
         score: score.toString(),
       };
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({
+      outfitId: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { outfitId } = input;
+      const deletedOutfit = await ctx.db.delete(outfits).where(and(eq(outfits.id, outfitId), eq(outfits.userId, ctx.session.user.id)));
+      return deletedOutfit;
     }),
 }); 

@@ -7,10 +7,10 @@ import type { ClothingItem, User } from "~/server/db/schema";
 import { useState } from "react";
 import { Trash2, Shirt, ShirtIcon } from "lucide-react";
 import { useToast } from "~/app/components/hooks/use-toast";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/app/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "~/app/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "~/app/components/ui/sheet";
 import { Button } from "~/app/components/ui/button";
-
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "~/app/components/ui/hover-card";
 type Category = "all" | "tops" | "bottoms" | "misc";
 
 export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobeItems: ClothingItem[], user: User }) {
@@ -130,31 +130,46 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
                                         <p className="text-md text-white tracking-wide max-w-[60%] truncate">{item.name}</p>
                                     </div>
                                     <div className="absolute bottom-2 right-2 flex items-center gap-2 hover:cursor-pointer">
-                                        <Button
-                                            variant={item.status === "available" ? "default" : "destructive"}
-                                            size="icon"
-                                            className="hover:cursor-pointer"
-                                            disabled={isUpdatingStatus}
-                                            onClick={(e) => handleStatusToggle(item, e)}
-                                        >
-                                            {item.status === "available" ? (
-                                                <Shirt className="h-4 w-4" />
-                                            ) : (
-                                                <ShirtIcon className="h-4 w-4" />
-                                            )}
-                                        </Button>
-                                        <Button
-                                            variant="destructive"
-                                            size="icon"
-                                            className="hover:cursor-pointer"
-                                            disabled={isDeleting}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDelete(item);
-                                            }}
+                                        <HoverCard>
+                                            <HoverCardTrigger>
+                                                <Button
+                                                    variant={item.status === "available" ? "default" : "destructive"}
+                                                    size="icon"
+                                                    className={`hover:cursor-pointer ${isUpdatingStatus ? "opacity-50" : ""}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        isUpdatingStatus ? null : handleStatusToggle(item, e);
+                                                    }}
+                                                >
+                                                    {item.status === "available" ? (
+                                                        <Shirt className="h-4 w-4" />
+                                                    ) : (
+                                                        <ShirtIcon className="h-4 w-4" />
+                                                    )}
+                                                </Button>
+                                                </HoverCardTrigger>
+                                            <HoverCardContent className="p-2 absolute -top-15 !z-70 w-min text-nowrap">
+                                                <p>{item.status === "available" ? "Make Item Unavailable" : "Make Item Available"}</p>
+                                            </HoverCardContent>
+                                        </HoverCard>
+                                        <HoverCard>
+                                            <HoverCardTrigger>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    className={`hover:cursor-pointer ${isDeleting ? "opacity-50" : ""}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        isDeleting ? null : handleDelete(item);
+                                                    }}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
+                                            </HoverCardTrigger>
+                                            <HoverCardContent className="p-2 absolute -top-15 !z-70 w-min text-nowrap">
+                                                <p>Delete Item</p>
+                                            </HoverCardContent>
+                                        </HoverCard>
                                     </div>
                                 </div>
                             </div>
