@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { clothingItems, outfits } from "~/server/db/schema";
+import { clothingItems, outfits, outfitFeedback } from "~/server/db/schema";
 import OpenAI from "openai";
 import { env } from "~/env";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 const openai = new OpenAI({
@@ -120,6 +120,7 @@ export const outfitRouter = createTRPCRouter({
       }).returning();
 
       return {
+        id: insertedOutfit[0].id,
         name,
         description,
         top: top.item,
@@ -127,5 +128,41 @@ export const outfitRouter = createTRPCRouter({
         misc: misc.item,
         prompt: input.prompt,
       };
-    })
+    }),
+
+  addFeedback: protectedProcedure
+    .input(z.object({ 
+      outfitId: z.string(),
+      rating: z.number().min(1).max(5),
+      comment: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.session?.user) {
+        throw new Error("Not authenticated");
+      }
+
+      const feedback = await ctx.db.insert(outfitFeedback).values({
+        outfitId: input.outfitId,
+        userId: ctx.session.user.id,
+        rating: input.rating,
+        comment: input.comment,
+      }).returning();
+
+      return feedback[0];
+    }),
+
+  getFeedback: protectedProcedure
+    .input(z.object({ outfitId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      if (!ctx.session?.user) {
+        throw new Error("Not authenticated");
+      }
+
+      const feedback = await ctx.db.query.outfitFeedback.findMany({
+        where: eq(outfitFeedback.outfitId, input.outfitId),
+        orderBy: (feedback, { desc }) => [desc(feedback.createdAt)],
+      });
+
+      return feedback;
+    }),
 }); 
