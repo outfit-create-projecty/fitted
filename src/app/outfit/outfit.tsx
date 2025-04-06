@@ -15,7 +15,8 @@ export default function OutfitClient({ user }: { user: User }) {
         description: string,
         top: ClothingItem,
         bottom: ClothingItem,
-        misc: ClothingItem,
+        misc: ClothingItem[],
+        shoes: ClothingItem,
         id?: string
     } | null>(null);
     const createOutfit = api.outfit.create.useMutation();
@@ -128,22 +129,39 @@ export default function OutfitClient({ user }: { user: User }) {
                                         <p className="text-sm text-gray-600">{generatedOutfit.bottom.name}</p>
                                     </div>
                                 )}
-                                {generatedOutfit.misc && (
+                                {generatedOutfit.shoes && (
                                     <div 
                                         className="p-4 border rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
-                                        onClick={() => setSelectedItem(generatedOutfit.misc)}
+                                        onClick={() => setSelectedItem(generatedOutfit.shoes)}
                                     >
                                         <div className="relative w-full aspect-square mb-2">
                                             <img
-                                                src={generatedOutfit.misc.image}
-                                                alt={generatedOutfit.misc.name}
+                                                src={generatedOutfit.shoes.image}
+                                                alt={generatedOutfit.shoes.name}
                                                 className="object-cover rounded-lg"
                                             />
                                         </div>
-                                        <h3 className="font-medium">Accessory</h3>
-                                        <p className="text-sm text-gray-600">{generatedOutfit.misc.name}</p>
+                                        <h3 className="font-medium">Shoes</h3>
+                                        <p className="text-sm text-gray-600">{generatedOutfit.shoes.name}</p>
                                     </div>
                                 )}
+                                {generatedOutfit.misc.map((item) => (
+                                    <div 
+                                        key={item.id}
+                                        className="p-4 border rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                                        onClick={() => setSelectedItem(item)}
+                                    >
+                                        <div className="relative w-full aspect-square mb-2">
+                                            <img
+                                                src={item.image}
+                                                alt={item.name}
+                                                className="object-cover rounded-lg"
+                                            />
+                                        </div>
+                                        <h3 className="font-medium">{item.classification}</h3>
+                                        <p className="text-sm text-gray-600">{item.name}</p>
+                                    </div>
+                                ))}
                             </div>
 
                             {/* Feedback Section */}

@@ -74,6 +74,7 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
                     <TabsTrigger value="all" className="w-24">All</TabsTrigger>
                     <TabsTrigger value="top" className="w-24">Tops</TabsTrigger>
                     <TabsTrigger value="bottom" className="w-24">Bottoms</TabsTrigger>
+                    <TabsTrigger value="shoes" className="w-24">Shoes</TabsTrigger>
                     <TabsTrigger value="misc" className="w-24">Misc</TabsTrigger>
                 </TabsList>
 

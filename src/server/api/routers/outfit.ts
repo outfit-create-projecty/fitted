@@ -73,16 +73,18 @@ export const outfitRouter = createTRPCRouter({
       const sortedOutfitItems = outfitItems.sort((a, b) => b.score - a.score);
       const top = sortedOutfitItems.find((item) => item.item.classification === "top");
       const bottom = sortedOutfitItems.find((item) => item.item.classification === "bottom");
-      const misc =  sortedOutfitItems.find((item) => item.item.classification !== "top" && item.item.classification !== "bottom");
+      const shoes = sortedOutfitItems.find((item) => item.item.classification === "shoes");
+      const misc =  sortedOutfitItems.filter((item) => item.item.classification === "misc").slice(0, 3);
       
-      if(!top || !bottom || !misc) {
+      if(!top || !bottom || !shoes) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No outfit items found" });
       }
 
       const createdOutfit = {
         top: top.item,
         bottom: bottom.item,
-        misc: misc.item,
+        shoes: shoes.item,
+        misc: misc.map((item) => item.item),
       };
 
       const outfitDescription = await openai.chat.completions.create({
@@ -96,8 +98,9 @@ export const outfitRouter = createTRPCRouter({
             role: "user",
             content: `Create a name and description for this outfit. Prompt: ${input.prompt}. Pieces: ${[
               createdOutfit.top?.description,
-              createdOutfit.bottom?.description, 
-              createdOutfit.misc?.description
+              createdOutfit.bottom?.description,
+              createdOutfit.shoes?.description,
+              createdOutfit.misc?.map((item) => item.description).join(", ")
             ].filter(Boolean).join(", ")}`
           }
         ],
@@ -114,18 +117,20 @@ export const outfitRouter = createTRPCRouter({
         description,
         topId: top.item.id,
         bottomId: bottom.item.id,
-        miscId: misc.item.id,
+        shoesId: shoes.item.id,
+        miscIds: misc.map((item) => item.item.id),
         userId: ctx.session.user.id,
         prompt: input.prompt,
       }).returning();
 
       return {
-        id: insertedOutfit[0].id,
+        id: insertedOutfit[0]?.id,
         name,
         description,
         top: top.item,
         bottom: bottom.item,
-        misc: misc.item,
+        shoes: shoes.item,
+        misc: misc.map((item) => item.item),
         prompt: input.prompt,
       };
     }),

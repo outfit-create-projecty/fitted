@@ -107,15 +107,17 @@ export const outfits = createTable("outfit", (d) => ({
   description: d.varchar({ length: 4096 }).notNull(),
   topId: d.varchar({ length: 255 }).references(() => clothingItems.id),
   bottomId: d.varchar({ length: 255 }).references(() => clothingItems.id),
-  miscId: d.varchar({ length: 255 }).references(() => clothingItems.id),
+  miscIds: d.varchar({ length: 255 }).array(),
+  shoesId: d.varchar({ length: 255 }).references(() => clothingItems.id),
   userId: d.varchar({ length: 255 }).notNull().references(() => users.id),
 }));
 
-export const outfitsRelations = relations(outfits, ({ one }) => ({
+export const outfitsRelations = relations(outfits, ({ one, many }) => ({
   user: one(users, { fields: [outfits.userId], references: [users.id] }),
   top: one(clothingItems, { fields: [outfits.topId], references: [clothingItems.id] }),
   bottom: one(clothingItems, { fields: [outfits.bottomId], references: [clothingItems.id] }),
-  misc: one(clothingItems, { fields: [outfits.miscId], references: [clothingItems.id] }),
+  shoes: one(clothingItems, { fields: [outfits.shoesId], references: [clothingItems.id] }),
+  misc: many(clothingItems, { relationName: "clothing_item_outfit" }),
 }));
 
 export const clothingItemsOutfits = createTable("clothing_item_outfit", (d) => ({

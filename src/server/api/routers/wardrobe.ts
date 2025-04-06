@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { clothingItems } from "~/server/db/schema";
+import { clothingItems, outfits } from "~/server/db/schema";
 import OpenAI from "openai";
 import { env } from "~/env";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 const openai = new OpenAI({
@@ -19,7 +19,7 @@ const s3Client = new S3Client({
   },
 });
 
-const prompt = "You are a fashion expert. In a JSON format, classify this clothing item into 'top', 'bottom', or 'misc'. Along with this, create a name for it, and write a short description of it. Also create a list of stylistic tags that describe it. Please respond in the following format: { classification: 'top' | 'bottom' | 'misc', name: string, description: string, tags: string[] }";
+const prompt = "You are a fashion expert. In a JSON format, classify this clothing item into 'top', 'bottom', 'shoes', or 'misc'. Along with this, create a name for it, and write a short description of it. Also create a list of stylistic tags that describe it. Please respond in the following format: { classification: 'top' | 'bottom' | 'shoes' | 'misc', name: string, description: string, tags: string[] }";
 
 export const wardrobeRouter = createTRPCRouter({
   list: protectedProcedure
@@ -117,6 +117,10 @@ export const wardrobeRouter = createTRPCRouter({
         Bucket: env.AWS_BUCKET_NAME,
         Key: `${input.userId}/${input.id}`,
       }));
+
+      // Delete all outfits that contain this item
+      await ctx.db.delete(outfits)
+        .where(or(eq(outfits.topId, input.id), eq(outfits.bottomId, input.id), eq(outfits.shoesId, input.id)));
 
       // Delete from database
       await ctx.db.delete(clothingItems)
