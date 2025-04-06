@@ -89,7 +89,7 @@ export default function WeatherInfo() {
         console.log("Location data:", locationData);
         
         // Get the API key from environment variables
-        const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+        const apiKey = "c7f2bcd55ac92f67ea50a60ecc6b8f61";
         
         if (!apiKey) {
           throw new Error("OpenWeather API key is missing");
