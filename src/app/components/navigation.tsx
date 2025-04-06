@@ -45,7 +45,7 @@ export default function Navigation(props: { user ?: Session['user'] }) {
                     </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-40 m-4">
-                    <DropdownMenuLabel>Hello, {user.name}</DropdownMenuLabel>
+                    <DropdownMenuLabel className="font-bold">Hello, {user.name}</DropdownMenuLabel>
                     <DropdownMenuItem>
                         <Link href="/add">Add to Wardrobe</Link>
                     </DropdownMenuItem>

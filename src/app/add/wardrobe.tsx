@@ -109,12 +109,12 @@ export default function Wardrobe({ user }: { user: User }) {
 
     return (
         <div className="w-full max-w-2xl p-6">
-            <h1 className="text-3xl font-bold mb-6">Add to Wardrobe</h1>
+            <h1 className="text-6xl font-bold mb-6 text-center">Add to Wardrobe</h1>
             
             <div className="space-y-4">
                 {!uploadComplete ? (
                     <div 
-                        className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
+                        className="border-2 border-dashed border-gray-300 rounded-lg p-6 h-[20vh] flex flex-col justify-center items-center text-center"
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                     >
@@ -144,8 +144,8 @@ export default function Wardrobe({ user }: { user: User }) {
                                     </div>
                                 ) : (
                                     <>
-                                        <p className="text-lg">Click to upload images</p>
-                                        <p className="text-sm">or drag and drop multiple files</p>
+                                        <p className="text-xl">Click to upload images</p>
+                                        <p className="text-md">or drag and drop multiple files</p>
                                     </>
                                 )}
                             </div>

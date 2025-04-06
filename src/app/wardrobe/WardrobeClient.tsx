@@ -59,24 +59,27 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
 
     return (
         <div className="w-full bg-accent-light min-h-[calc(100vh-156px)] p-16">
-            <div className="flex justify-between items-center mb-6 w-full">
+            <div className="flex flex-col gap-4 w-full pb-8">
                 <h1 className="text-5xl py-4 font-extrabold text-black">Your Wardrobe</h1>
-                <Link
-                    href="/add"
-                    className="ml-auto px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
-                >
-                    Add New Piece
-                </Link>
+                <p className="text-md text-black">You have {wardrobeItems?.length} items in your wardrobe</p>
             </div>
 
             <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setCurrentCategory(value as Category)}>
-                <TabsList className="mb-4 w-[40vw] bg-primary-foreground">
-                    <TabsTrigger value="all" className="w-[8vw]">All</TabsTrigger>
-                    <TabsTrigger value="top" className="w-[8vw]">Tops</TabsTrigger>
-                    <TabsTrigger value="bottom" className="w-[8vw]">Bottoms</TabsTrigger>
-                    <TabsTrigger value="shoes" className="w-[8vw]">Shoes</TabsTrigger>
-                    <TabsTrigger value="misc" className="w-[8vw]">Misc</TabsTrigger>
-                </TabsList>
+                <div className="flex flex-row items-center">
+                    <TabsList className="mb-4 w-[40vw] bg-primary-foreground">
+                        <TabsTrigger value="all" className="w-[8vw]">All</TabsTrigger>
+                        <TabsTrigger value="top" className="w-[8vw]">Tops</TabsTrigger>
+                        <TabsTrigger value="bottom" className="w-[8vw]">Bottoms</TabsTrigger>
+                        <TabsTrigger value="shoes" className="w-[8vw]">Shoes</TabsTrigger>
+                        <TabsTrigger value="misc" className="w-[8vw]">Misc</TabsTrigger>
+                    </TabsList>
+                    <Link
+                        href="/add"
+                        className="ml-auto px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
+                    >
+                        Add New Piece
+                    </Link>
+                </div>
 
                 {filteredItems?.length === 0 ? (
                     <div className="text-center py-8">
@@ -108,12 +111,14 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
                                     className="object-cover !z-50"
                                 />
                                 <div className="w-full h-full bg-white absolute inset-0 !z-40"></div>
-                                <div className="absolute inset-0 !z-60 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200">
+                                <div className="absolute inset-0 !z-60 bg-opacity-0 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <div className="absolute bottom-0 h-13 w-full bg-black p-2 px-4 flex items-center">
+                                        <p className="text-md text-white tracking-wide max-w-[80%] truncate">{item.name}</p>
+                                    </div>
                                     <div className="absolute bottom-2 right-2">
                                         <Button
                                             variant="destructive"
                                             size="icon"
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleDelete(item);
@@ -130,22 +135,28 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
             </Tabs>
 
             <Sheet open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
-                <SheetContent className="p-8">
+                <SheetContent className="p-8 pt-[100px]">
                     {selectedItem && (
                         <>
                             <SheetHeader>
-                                <SheetTitle>{selectedItem.name}</SheetTitle>
-                                <SheetDescription>{selectedItem.description}</SheetDescription>
+                                <SheetTitle className="text-4xl font-bold pb-4">{selectedItem.name}</SheetTitle>
+                                <SheetDescription className="text-md">{selectedItem.description}</SheetDescription>
                             </SheetHeader>
-                            <div className="mt-4">
+                            <div>
                                 <img
                                     src={`https://d2fz44w91whf0y.cloudfront.net/${user.id}/${selectedItem.id}`}
                                     alt={selectedItem.name}
-                                    className="w-full rounded-lg"
+                                    className="w-full rounded-xl border-2 border-black"
                                 />
-                                <div className="mt-4 space-y-2">
-                                    <p className="text-sm text-gray-500">Classification: {selectedItem.classification}</p>
-                                </div>
+                            </div>
+                            <div className="mt-8 flex justify-end">
+                                <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    onClick={() => handleDelete(selectedItem)}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
                             </div>
                         </>
                     )}

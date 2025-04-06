@@ -12,10 +12,10 @@ export default async function WardrobePage() {
     const user = await api.user.get({ id: session.user.id });
     if(!user) return redirect("/login");
 
-    return (<main className="h-full flex flex-col">
+    return (<main className="h-full flex flex-col bg-secondary">
         <Navigation user={session.user} />
         <div className="size-[72px]"></div>
-        <div className="flex-1 flex flex-col items-center justify-center min-h-[calc(100vh-72px)] bg-white.p bg-cover bg-center">
+        <div className="flex-1 flex flex-col items-center justify-center min-h-[calc(100vh-72px)]">
             <Wardrobe user={user} />
         </div>
         <Footer />

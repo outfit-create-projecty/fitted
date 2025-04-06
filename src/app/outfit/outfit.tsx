@@ -61,32 +61,29 @@ export default function OutfitClient({ user }: { user: User }) {
     };
 
     return (
-        <div className="w-fullcontainer px-4 py-8 min-h-[calc(100vh-72px)] bg-secondary">
-            <div className="max-w-2xl mx-auto">
-                <h1 className="text-3xl font-bold mb-6">Generate Your Outfit</h1>
+        <div className="w-fullcontainer px-4 py-8 min-h-[calc(100vh-72px)] bg-primary-ultradark">
+            <div className="max-w-2xl mx-auto my-32">
+                <h1 className="text-6xl font-extrabold mb-6 text-center text-green-100">Generate Your Outfit</h1>
                 
                 <div className="space-y-4">
                     <div>
-                        <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 mb-2">
-                            Describe your desired outfit
-                        </label>
                         <textarea
                             id="prompt"
                             value={prompt}
                             onChange={(e) => setPrompt(e.target.value)}
                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             rows={3}
-                            placeholder="e.g., A casual summer outfit for a beach day..."
+                            placeholder="A casual summer outfit for a beach day..."
                         />
                     </div>
 
                     <button
                         onClick={() => generateOutfit()}
                         disabled={isGenerating || !prompt.trim()}
-                        className={`w-full py-2 px-4 rounded-lg text-primary-foreground font-medium ${
+                        className={`w-full py-2 px-4 rounded-lg text-accent-light font-medium ${
                             isGenerating || !prompt.trim()
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-primary hover:bg-secondary"
+                                ? "bg-gray-800 cursor-not-allowed"
+                                : "bg-black hover:bg-gray-950 hover:cursor-pointer"
                         }`}
                     >
                         {isGenerating ? "Generating..." : "Generate Outfit"}
