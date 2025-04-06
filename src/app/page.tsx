@@ -4,6 +4,7 @@ import { Button } from "./components/ui/button";
 import Link from "next/link";
 import Footer from "./components/footer";
 import Typing from "./typing";
+import { WashingMachine } from "lucide-react";
 const prompts = ["Help! I have a meeting soon. What should I wear?", "Help! I have a date tonight. What should I wear?", "Help! I have a job interview tomorrow. What should I wear?"];
 
 export default async function Home() {
@@ -15,7 +16,7 @@ export default async function Home() {
         <div>
             <div className="bg-accent-light p-24 h-[85vh] flex flex-row gap-6 items-center text-primary-foreground border-m-primary-light">
                 <div className="text-center flex-1 pr-24 flex flex-col gap-8 z-20 items-center">
-                    <h1 className="font-extrabold text-9xl tracking-tighter text-black">ProjectY</h1>   
+                    <h1 className="font-extrabold text-9xl tracking-tighter text-black flex flex-row items-center"><WashingMachine className="size-24" /> Fit<span className="text-primary">ted</span></h1>   
                     <p className="font-normal text-2xl text-black tracking-widest">Choose your style.</p>
                     <div className="flex flex-row justify-start gap-8">
                         <Link href="/about">
@@ -43,7 +44,36 @@ export default async function Home() {
         <div className="bg-green-100 p-24 h-[85vh] flex flex-row gap-6 items-center text-primary-foreground border-m-primary-light">
             <div className="text-center flex-1 pr-24 flex flex-col gap-8 z-20 items-center">
                 <h1 className="font-extrabold text-7xl tracking-tighter text-black">Outfits are <span className="text-primary">hard</span></h1>   
-                <p className="font-normal text-2xl text-black tracking-widest">We can do it for you.</p>
+                <p className="font-normal text-2xl text-black tracking-widest">Let us do it for you.</p>
+            </div>
+        </div>
+        <div className="bg-primary-light p-24 h-[85vh] flex flex-col gap-18 justify-center text-primary-foreground border-m-primary-light">
+            <div className="bg-primary-ultralight rounded-full mr-auto p-12 flex flex-col items-center">
+                <h1 className="font-bold text-4xl tracking-tighter text-black">What should I wear for my formal dinner date tonight?</h1>
+            </div>
+            <div className="bg-primary-ultralight rounded-full ml-auto p-12 flex flex-col items-center">
+                <h1 className="font-bold text-4xl tracking-tighter text-black">Going for a beach walk, but my laundry is in the dryer.</h1>
+            </div>
+            <div className="bg-primary-ultralight rounded-full mr-auto p-12 flex flex-col items-center">
+                <h1 className="font-bold text-4xl tracking-tighter text-black">Presenting in front of the executive board tonight but it's raining!</h1>
+            </div>
+        </div>
+        <div className="bg-primary-ultradark p-24 h-[85vh] flex flex-row gap-6 items-center text-primary-foreground border-m-primary-light">
+            <div className="flex flex-1 flex-col gap-8">
+                <h1 className="font-extrabold text-7xl tracking-tighter text-white">Experience a whole new way to dress.</h1>   
+                <p className="font-normal text-2xl text-white tracking-widest">Choose your style.</p>
+            </div>
+            <div className="flex flex-1 flex-col gap-8 items-center justify-center">
+                <Link href="/about">
+                    <Button className="w-80 bg-accent-dark text-xl text-white font-medium p-6 hover:bg-primary-dark duration-300">
+                        About Us
+                    </Button>
+                </Link>
+                <Link href="/login">
+                    <Button className="w-80 bg-accent-main text-xl text-white font-bold p-6 hover:bg-accent-dark duration-300">
+                        Get Started
+                    </Button>
+                </Link>
             </div>
         </div>
         
