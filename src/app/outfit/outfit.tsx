@@ -155,7 +155,7 @@ export default function OutfitClient({ user }: { user: User }) {
                                                 className="object-cover rounded-lg"
                                             />
                                         </div>
-                                        <h3 className="font-mediumtext-black">Miscellaneous</h3>
+                                        <h3 className="font-medium text-black">Miscellaneous</h3>
                                         <p className="text-sm text-gray-600">{item.name}</p>
                                     </div>
                                 ))}
