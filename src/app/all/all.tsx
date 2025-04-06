@@ -125,8 +125,8 @@ export default function AllOutfits({ user }: { user: User }) {
                         onClick={() => setSelectedOutfit(outfit as Outfit)}
                     >
                         <h1 className="text-3xl font-bold text-black w-full">{outfit.name}</h1>
-                        <p className="text-md text-black overflow-ellipsis h-1/3 overflow-hidden w-full">{outfit.description}</p>
-                        <div className="flex items-center w-full gap-1 mt-auto">
+                        <p className="text-md text-black overflow-ellipsis h-1/3 overflow-hidden flex-1 w-full pb-1">{outfit.description}</p>
+                        <div className="flex items-center w-full gap-1">
                             <p className="text-md text-gray-950 font-medium mr-auto">{Math.round(Number(outfit.score) * 100)}%</p>
                             <div className="flex items-center gap-1 hover:scale-[1.05] duration-300 transition-transform">
                                 {[1, 2, 3, 4, 5].map((star) => (
