@@ -5,7 +5,7 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useToast } from "../components/hooks/use-toast";
 import WeatherInfo from "../components/weather-info";
-
+import { Button } from "../components/ui/button";
 export default function OutfitClient({ user }: { user: User }) {
     const [prompt, setPrompt] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
@@ -194,24 +194,23 @@ export default function OutfitClient({ user }: { user: User }) {
 
             {/* Item Details Modal */}
             {selectedItem && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <div className="relative w-full aspect-square mb-4">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedItem(null)}>
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full top-[88px]" onClick={(e) => e.stopPropagation()}>
+                        <div className="relative w-full aspect-square mb-4 flex items-center justify-center">
                             <img
                                 src={selectedItem.image}
                                 alt={selectedItem.name}
                                 className="object-cover rounded-lg"
                             />
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">{selectedItem.name}</h3>
+                        <h3 className="text-xl font-semibold mb-2 text-black">{selectedItem.name}</h3>
                         <p className="text-gray-600 mb-2">{selectedItem.description}</p>
-                        <p className="text-sm text-gray-500">Type: {selectedItem.classification}</p>
-                        <button
+                        <Button
                             onClick={() => setSelectedItem(null)}
-                            className="mt-4 w-full py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                            className="text-black mt-4 w-full py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
                         >
                             Close
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}
