@@ -172,7 +172,7 @@ export default function OutfitClient({ user }: { user: User }) {
                                     value={feedback}
                                     onChange={(e) => setFeedback(e.target.value)}
                                     placeholder="Describe how you'd like to modify the outfit..."
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
+                                    className="w-full px-4 py-2 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
                                     rows={3}
                                 />
                                 <button

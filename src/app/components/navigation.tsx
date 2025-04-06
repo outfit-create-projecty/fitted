@@ -29,23 +29,23 @@ export default function Navigation(props: { user ?: Session['user'] }) {
         </Button>
 
         <div className="hidden md:flex gap-6 ml-auto mr-8">
-            <Button variant="link" className="text-white">
+            <Button variant="link" className="text-white rounded-none bg-gradient-to-br hover:from-violet-500 hover:to-primary-ultralight duration-400 transition-colors">
                 <Link href="/outfit">Create Outfit</Link>
             </Button>
-            <Button variant="link" className="text-white">
+            <Button variant="link" className="text-white rounded-none bg-gradient-to-br hover:from-violet-500 hover:to-primary-ultralight duration-400 transition-colors">
                 <Link href="/all">All Outfits</Link>
             </Button>
-            <Button variant="link" className="text-white">
+            <Button variant="link" className="text-white rounded-none bg-gradient-to-br hover:from-violet-500 hover:to-primary-ultralight duration-400 transition-colors">
                 <Link href="/add">Add Clothes</Link>
             </Button>
-            <Button variant="link" className="text-white">
+            <Button variant="link" className="text-white rounded-none bg-gradient-to-br hover:from-violet-500 hover:to-primary-ultralight duration-400 transition-colors">
                 <Link href="/wardrobe">View Wardrobe</Link>
             </Button>
             { user ? <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger>
-                    <Avatar className="size-8 bg-white">
-                        <AvatarImage src="default.png" />
-                        <AvatarFallback>You</AvatarFallback>
+                <DropdownMenuTrigger>
+                    <Avatar className="size-8 bg-white hover:bg-gradient-to-br hover:from-violet-500 hover:to-primary-ultralight duration-400 transition-colors">
+                            <AvatarImage src="default.png" />
+                            <AvatarFallback>You</AvatarFallback>
                     </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-40 m-4">

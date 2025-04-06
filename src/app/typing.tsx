@@ -49,8 +49,8 @@ export default function Typing() {
     }, [currentPromptIndex, isTyping]);
 
     return (
-        <div className="!z-40 flex flex-col gap-8 rounded-4xl bg-gray-950 p-12">
-            <h1 className="text-2xl font-bold flex flex-row items-center">
+        <div className="!z-40 flex flex-col gap-8 rounded-4xl bg-gray-950 p-12 hover:scale-[1.04] duration-300 transition-transform">
+            <h1 className="text-2xl font-bold leading-none">
                 {displayedText}
                 <span className={`inline-block w-0.5 ml-0.5 h-6 bg-white ${showCursor ? 'opacity-100' : 'opacity-0'}`}></span>
             </h1>
