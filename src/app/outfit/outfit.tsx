@@ -37,8 +37,8 @@ export default function OutfitClient({ user }: { user: User }) {
         } catch (error) {
             toast({
                 title: "Uh oh!",
-                description: "Failed to generate outfit",
-                className: "bg-red-300",
+                description: (error as Error).message || "Failed to generate outfit",
+                variant: "destructive",
                 duration: 2000,
             });
         } finally {
@@ -63,7 +63,7 @@ export default function OutfitClient({ user }: { user: User }) {
                 <div className="mb-8">
                     <WeatherInfo />
                 </div>
-                 
+                
                 <div className="space-y-4">
                     <div>
                         <textarea
@@ -162,7 +162,7 @@ export default function OutfitClient({ user }: { user: User }) {
                             </div>
 
                             {/* Feedback Section */}
-                            <div className="mt-6 border-t pt-6">
+                            <div className="text-black mt-6 border-t pt-6">
                                 <h3 className="text-lg font-medium mb-4 text-black">Want to modify this outfit?</h3>
                                 <p className="text-sm text-gray-600 mb-4">
                                     Tell us what you'd like to change about the outfit. For example:
