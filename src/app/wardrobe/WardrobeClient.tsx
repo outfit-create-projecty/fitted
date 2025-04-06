@@ -18,7 +18,7 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
     const [currentCategory, setCurrentCategory] = useState<Category>("all");
     const [selectedItem, setSelectedItem] = useState<ClothingItem | null>(null);
 
-    const { data: wardrobeItems, refetch: refetchWardrobe } = api.wardrobe.list.useQuery(undefined, {
+    const { data: wardrobeItems } = api.wardrobe.list.useQuery(undefined, {
         initialData: initialWardrobeItems,
     });
 
@@ -29,7 +29,6 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
 
     const { mutate: deletePiece, isPending: isDeleting } = api.wardrobe.deletePiece.useMutation({
         onSuccess: () => {
-            void refetchWardrobe();
             toast({
                 title: "Success",
                 description: "Your item has been deleted from your wardrobe.",
@@ -50,6 +49,10 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
     });
 
     const handleDelete = (item: ClothingItem) => {
+        const index = wardrobeItems?.findIndex(i => i.id === item.id);
+        if (index !== undefined && index !== -1) {
+            wardrobeItems?.splice(index, 1);
+        }
         deletePiece({
             id: item.id,
             userId: user.id,
@@ -180,6 +183,7 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
                                     variant="destructive"
                                     size="icon"
                                     onClick={() => handleDelete(selectedItem)}
+                                    disabled={isDeleting}
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
