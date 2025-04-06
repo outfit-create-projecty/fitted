@@ -30,9 +30,25 @@ export const outfitRouter = createTRPCRouter({
           bottom: true,
           shoes: true,
         },
+        orderBy: (outfit, { desc }) => [desc(outfit.id)],
       });
 
       return allOutfits;
+    }),
+
+  rate: protectedProcedure
+    .input(z.object({
+      outfitId: z.string(),
+      rating: z.number().min(1).max(5),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { outfitId, rating } = input;
+
+      const updatedOutfit = await ctx.db.update(outfits).set({
+        rating,
+      }).where(eq(outfits.id, outfitId));
+
+      return updatedOutfit;
     }),
 
   create: protectedProcedure
@@ -56,7 +72,6 @@ export const outfitRouter = createTRPCRouter({
       const availableTops = items.filter(item => item.classification === "top");
       const availableBottoms = items.filter(item => item.classification === "bottom");
       const availableShoes = items.filter(item => item.classification === "shoes");
-      const availableMisc = items.filter(item => item.classification === "misc");
 
       if (availableTops.length === 0 || availableBottoms.length === 0 || availableShoes.length === 0) {
         throw new TRPCError({
@@ -173,41 +188,5 @@ export const outfitRouter = createTRPCRouter({
         prompt: description,
         score: score.toString(),
       };
-    }),
-
-  addFeedback: protectedProcedure
-    .input(z.object({ 
-      outfitId: z.string(),
-      rating: z.number().min(1).max(5),
-      comment: z.string().optional(),
-    }))
-    .mutation(async ({ ctx, input }) => {
-      if (!ctx.session?.user) {
-        throw new Error("Not authenticated");
-      }
-
-      const feedback = await ctx.db.insert(outfitFeedback).values({
-        outfitId: input.outfitId,
-        userId: ctx.session.user.id,
-        rating: input.rating,
-        comment: input.comment,
-      }).returning();
-
-      return feedback[0];
-    }),
-
-  getFeedback: protectedProcedure
-    .input(z.object({ outfitId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      if (!ctx.session?.user) {
-        throw new Error("Not authenticated");
-      }
-
-      const feedback = await ctx.db.query.outfitFeedback.findMany({
-        where: eq(outfitFeedback.outfitId, input.outfitId),
-        orderBy: (feedback, { desc }) => [desc(feedback.createdAt)],
-      });
-
-      return feedback;
     }),
 }); 

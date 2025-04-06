@@ -35,7 +35,7 @@ export default async function Home() {
                 <div className="relative flex-1 flex flex-row justify-center items-center gap-8 w-full h-full m-8">
                     <div className="rounded-4xl bg-cover bg-center!z-10 w-100 h-70 absolute top-10 left-5 border-2 border-white" style={{ backgroundImage: 'url("collage1.jpg")', backgroundSize: 'cover' }}></div>
                     <div className="rounded-4xl bg-cover bg-center !z-20 w-100 h-70 absolute bottom-10 left-10 border-2 border-white" style={{ backgroundImage: 'url("collage2.jpg")', backgroundSize: 'cover' }}></div>
-                    <div className="rounded-4xl bg-cover bg-center !z-30 w-80 h-130 absolute bottom-15 right-15 border-2 border-white" style={{ backgroundImage: 'url("collage3.jpg")', backgroundSize: 'cover' }}></div>
+                    <div className="rounded-4xl bg-cover bg-center !z-30 w-80 h-[50vh] absolute bottom-15 right-15 border-2 border-white" style={{ backgroundImage: 'url("collage3.jpg")', backgroundSize: 'cover' }}></div>
                     <Typing />
                 </div>
             </div>
