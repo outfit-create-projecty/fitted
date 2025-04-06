@@ -17,7 +17,8 @@ export default function Wardrobe({ user }: { user: User }) {
 
     const { mutate: addPiece } = api.wardrobe.addPiece.useMutation({
         onSuccess: () => {
-            setUploadProgress(uploadProgress + 100 / uploadCount);
+            setUploadProgress(prev => prev + 100 / uploadCount);
+
             toast({
                 title: "Success",
                 description: "Item added to wardrobe",

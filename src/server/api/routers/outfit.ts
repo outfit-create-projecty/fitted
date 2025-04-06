@@ -5,7 +5,7 @@ import OpenAI from "openai";
 import { env } from "~/env";
 import { eq, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-
+import type { ClothingItem } from "~/server/db/schema";
 const openai = new OpenAI({
   apiKey: env.OPENAI_API_KEY,
 });
@@ -126,7 +126,7 @@ export const outfitRouter = createTRPCRouter({
       const avg = (top.score + bottom.score + shoes.score) / 3;
       
       // Refined misc item selection logic
-      let misc = [];
+      let misc: { item: ClothingItem, score: number }[] = [];
       
       // Check if specific accessories are requested
       const hasSpecificAccessoryRequest = requestedAccessories && requestedAccessories.length > 0;
@@ -142,7 +142,7 @@ export const outfitRouter = createTRPCRouter({
           
           if (matchingItems.length > 0) {
             // Add the best matching item for this accessory type
-            misc.push(matchingItems[0]);
+            misc.push(matchingItems[0]!);
           }
         }
         
@@ -179,7 +179,7 @@ export const outfitRouter = createTRPCRouter({
         top: top.item,
         bottom: bottom.item,
         shoes: shoes.item,
-        misc: misc.map((item) => item.item),
+        misc: misc.map((item) => item?.item),
       };
 
       const outfitDescription = await openai.chat.completions.create({
@@ -195,7 +195,7 @@ export const outfitRouter = createTRPCRouter({
               createdOutfit.top?.description,
               createdOutfit.bottom?.description,
               createdOutfit.shoes?.description,
-              createdOutfit.misc?.map((item) => item.description).join(", ")
+              createdOutfit.misc?.map((item) => item?.description).join(", ")
             ].filter(Boolean).join(", ")}`
           }
         ],
@@ -213,7 +213,7 @@ export const outfitRouter = createTRPCRouter({
         topId: top.item.id,
         bottomId: bottom.item.id,
         shoesId: shoes.item.id,
-        miscIds: misc.map((item) => item.item.id),
+        miscIds: misc.map((item) => item?.item.id ?? ""),
         userId: ctx.session.user.id,
         prompt: description,
         score: score.toString(),
@@ -230,7 +230,7 @@ export const outfitRouter = createTRPCRouter({
         top: top.item,
         bottom: bottom.item,
         shoes: shoes.item,
-        misc: misc.map((item) => item.item),
+        misc: misc.map((item) => item?.item),
         prompt: description,
         score: score.toString(),
       };
