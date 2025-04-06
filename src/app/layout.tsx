@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
-  title: "Project Y",
+  title: "Fitted",
   description: "A wardrobe designing app",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
