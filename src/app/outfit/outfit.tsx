@@ -37,8 +37,8 @@ export default function OutfitClient({ user }: { user: User }) {
         } catch (error) {
             toast({
                 title: "Uh oh!",
-                description: "Failed to generate outfit",
-                className: "bg-red-300",
+                description: (error as Error).message || "Failed to generate outfit",
+                variant: "destructive",
                 duration: 2000,
             });
         } finally {
