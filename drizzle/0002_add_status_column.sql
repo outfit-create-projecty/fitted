@@ -1,0 +1,1 @@
+ALTER TABLE projecty_clothing_item ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'available'; 

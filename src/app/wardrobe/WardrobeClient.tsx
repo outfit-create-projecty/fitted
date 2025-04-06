@@ -2,25 +2,14 @@
 
 import { api } from "~/trpc/react";
 import Link from "next/link";
+import type { TRPCClientErrorLike } from "@trpc/client";
 import type { ClothingItem, User } from "~/server/db/schema";
 import { useState } from "react";
-
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "~/app/components/ui/alert-dialog";
-import { Button } from "~/app/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Shirt, ShirtIcon } from "lucide-react";
 import { useToast } from "~/app/components/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/app/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "~/app/components/ui/sheet";
+import { Button } from "~/app/components/ui/button";
 
 type Category = "all" | "tops" | "bottoms" | "misc";
 
@@ -29,7 +18,7 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
     const [currentCategory, setCurrentCategory] = useState<Category>("all");
     const [selectedItem, setSelectedItem] = useState<ClothingItem | null>(null);
 
-    const { data: wardrobeItems, refetch } = api.wardrobe.list.useQuery(undefined, {
+    const { data: wardrobeItems, refetch: refetchWardrobe } = api.wardrobe.list.useQuery(undefined, {
         initialData: initialWardrobeItems,
     });
 
@@ -40,12 +29,31 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
 
     const { mutate: deletePiece } = api.wardrobe.deletePiece.useMutation({
         onSuccess: () => {
-            void refetch();
+            void refetchWardrobe();
             toast({
                 title: "Success",
                 description: "Your item has been deleted from your wardrobe.",
                 className: "bg-green-300",
                 duration: 2000,
+            });
+        },
+    });
+
+    const { mutate: updateStatus } = api.wardrobe.updateStatus.useMutation({
+        onSuccess: () => {
+            refetchWardrobe();
+            toast({
+                title: "Success",
+                description: "Item status updated",
+                className: "bg-green-300",
+                duration: 2000,
+            });
+        },
+        onError: (error: TRPCClientErrorLike<any>) => {
+            toast({
+                title: "Error",
+                description: error.message,
+                variant: "destructive",
             });
         },
     });
@@ -57,8 +65,16 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
         });
     };
 
+    const handleStatusToggle = (item: ClothingItem, e: React.MouseEvent) => {
+        e.stopPropagation();
+        updateStatus({
+            itemId: item.id,
+            status: item.status === "available" ? "unavailable" : "available"
+        });
+    };
+
     return (
-        <div className="w-full bg-accent-light min-h-[calc(100vh-156px)] p-16">
+        <div className="w-full bg-secondary min-h-[calc(100vh-156px)] p-16">
             <div className="flex justify-between items-center mb-6 w-full">
                 <h1 className="text-5xl py-4 font-extrabold text-black">Your Wardrobe</h1>
                 <Link
@@ -99,17 +115,30 @@ export function WardrobeClient({ initialWardrobeItems, user }: { initialWardrobe
                         {filteredItems?.map((item: ClothingItem) => (
                             <div
                                 key={item.id}
-                                className="relative aspect-square border rounded-lg overflow-hidden group cursor-pointer flex items-center justify-center"
+                                className={`relative aspect-square border rounded-lg overflow-hidden group cursor-pointer ${
+                                    item.status === "unavailable" ? "opacity-50" : ""
+                                }`}
                                 onClick={() => setSelectedItem(item)}
                             >
                                 <img
                                     src={`https://d2fz44w91whf0y.cloudfront.net/${user.id}/${item.id}`}
                                     alt={item.name}
-                                    className="object-cover !z-50"
+                                    className="object-cover"
                                 />
-                                <div className="w-full h-full bg-white absolute inset-0 !z-40"></div>
-                                <div className="absolute inset-0 !z-60 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200">
-                                    <div className="absolute bottom-2 right-2">
+                                <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200">
+                                    <div className="absolute bottom-2 right-2 flex gap-2">
+                                        <Button
+                                            variant={item.status === "available" ? "default" : "destructive"}
+                                            size="icon"
+                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                            onClick={(e) => handleStatusToggle(item, e)}
+                                        >
+                                            {item.status === "available" ? (
+                                                <Shirt className="h-4 w-4" />
+                                            ) : (
+                                                <ShirtIcon className="h-4 w-4" />
+                                            )}
+                                        </Button>
                                         <Button
                                             variant="destructive"
                                             size="icon"

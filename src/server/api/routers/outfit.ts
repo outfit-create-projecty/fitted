@@ -4,7 +4,7 @@ import { clothingItems, outfits, outfitFeedback } from "~/server/db/schema";
 import OpenAI from "openai";
 import { env } from "~/env";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 const openai = new OpenAI({
@@ -21,8 +21,35 @@ function cosineSimilarity(a: number[], b: number[]): number {
 const prompt = "You are a fashion expert. I have a client that is trying to create an outfit for their specific prompt. Please return a list of stylistic tags in JSON formatthat describe the outfit. Please respond in the following format: { tags: string[] }";
 export const outfitRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(z.object({ prompt: z.string() }))
+    .input(
+      z.object({
+        description: z.string(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
+      const { description } = input;
+
+      // Get all available clothing items
+      const items = await ctx.db.query.clothingItems.findMany({
+        where: and(
+          eq(clothingItems.userId, ctx.session.user.id),
+          eq(clothingItems.status, "available")
+        ),
+      });
+
+      // Check if we have enough items of each type
+      const availableTops = items.filter(item => item.classification === "top");
+      const availableBottoms = items.filter(item => item.classification === "bottom");
+      const availableShoes = items.filter(item => item.classification === "shoes");
+      const availableMisc = items.filter(item => item.classification === "misc");
+
+      if (availableTops.length === 0 || availableBottoms.length === 0 || availableShoes.length === 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Not enough available items to create an outfit. Please mark some items as available or add more items to your wardrobe.",
+        });
+      }
+
       if (!ctx.session?.user) {
         throw new Error("Not authenticated");
       }
@@ -31,7 +58,7 @@ export const outfitRouter = createTRPCRouter({
         model: "gpt-4o-mini",
         messages: [
           { role: "system", content: prompt },
-          { role: "user", content: input.prompt },
+          { role: "user", content: description },
         ],
         response_format: { type: "json_object" },
       });
@@ -49,10 +76,6 @@ export const outfitRouter = createTRPCRouter({
       if(tagsEmbeddingArray.length === 0) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No tags embedding found" });
       }
-
-      const items = await ctx.db.query.clothingItems.findMany({
-        where: eq(clothingItems.userId, ctx.session.user.id)
-      });
 
       const outfitItems = items.map((item) => {
         const score = cosineSimilarity(item.tagsVector, tagsEmbeddingArray);
@@ -91,7 +114,7 @@ export const outfitRouter = createTRPCRouter({
           },
           {
             role: "user",
-            content: `Create a name and description for this outfit. Prompt: ${input.prompt}. Pieces: ${[
+            content: `Create a name and description for this outfit. Prompt: ${description}. Pieces: ${[
               createdOutfit.top?.description,
               createdOutfit.bottom?.description,
               createdOutfit.shoes?.description,
@@ -102,20 +125,20 @@ export const outfitRouter = createTRPCRouter({
         response_format: { type: "json_object" },
       });
 
-      const { name, description } = JSON.parse(outfitDescription.choices[0]?.message?.content ?? "{}");
-      if (!name || !description) {
+      const { name, description: outfitDescriptionDescription } = JSON.parse(outfitDescription.choices[0]?.message?.content ?? "{}");
+      if (!name || !outfitDescriptionDescription) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to generate outfit name/description" });
       }
 
       const insertedOutfit = await ctx.db.insert(outfits).values({
         name,
-        description,
+        description: outfitDescriptionDescription,
         topId: top.item.id,
         bottomId: bottom.item.id,
         shoesId: shoes.item.id,
         miscIds: misc.map((item) => item.item.id),
         userId: ctx.session.user.id,
-        prompt: input.prompt,
+        prompt: description,
         score: score.toString(),
       }).returning();
 
@@ -126,12 +149,12 @@ export const outfitRouter = createTRPCRouter({
       return {
         id: insertedOutfit[0].id,
         name,
-        description,
+        description: outfitDescriptionDescription,
         top: top.item,
         bottom: bottom.item,
         shoes: shoes.item,
         misc: misc.map((item) => item.item),
-        prompt: input.prompt,
+        prompt: description,
         score: score.toString(),
       };
     }),
