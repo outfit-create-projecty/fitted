@@ -16,13 +16,13 @@ export default async function Contact() {
                     <div className="flex justify-between w-full">
                         <div className="flex flex-col gap-4 items-start">
                             <div className="bg-white rounded-lg shadow-lg">
-                                <a href="./surya.png" target="_blank" rel="noopener noreferrer">
+                                <a href="https://www.instagram.com/surya.g06/" target="_blank" rel="noopener noreferrer">
                                     <img src="./surya.png" alt="Image 1" className="w-32 h-32 rounded-lg" />
                                 </a>
                                 <p className="text-center text-black font-bold">Surya</p>
                             </div>
                             <div className="bg-white rounded-lg shadow-lg">
-                                <a href="./holden.png" target="_blank" rel="noopener noreferrer">
+                                <a href="https://www.instagram.com/hwalfo2/" target="_blank" rel="noopener noreferrer">
                                     <img src="./holden.png" alt="Image 2" className="w-32 h-32 rounded-lg" />
                                 </a>
                                 <p className="text-center text-black font-bold">Holden</p>
@@ -30,13 +30,13 @@ export default async function Contact() {
                         </div>
                         <div className="flex flex-col gap-4">
                             <div className="bg-white rounded-lg shadow-lg">
-                                <a href="./emanuel.png" target="_blank" rel="noopener noreferrer">
+                                <a href="https://www.instagram.com/emanuel.medina24/" target="_blank" rel="noopener noreferrer">
                                     <img src="./emanuel.png" alt="Image 3" className="w-32 h-32 rounded-lg" />
                                 </a>
                                 <p className="text-center text-black font-bold">Emanuel</p>
                             </div>
                             <div className="bg-white rounded-lg shadow-lg">
-                                <a href="./sean.png" target="_blank" rel="noopener noreferrer">
+                                <a href="https://www.instagram.com/_seanlange/" target="_blank" rel="noopener noreferrer">
                                     <img src="./sean.png" alt="Image 4" className="w-32 h-32 rounded-lg" />
                                 </a>
                                 <p className="text-center text-black font-bold">Sean</p>
