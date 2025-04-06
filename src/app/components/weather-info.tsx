@@ -17,6 +17,56 @@ export default function WeatherInfo() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState<string>("");
+  const [currentTimeEmoji, setCurrentTimeEmoji] = useState<string>("");
+
+  // Function to update time and time emoji
+  const updateTime = () => {
+    const now = new Date();
+    const timeOptions: Intl.DateTimeFormatOptions = { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      second: '2-digit', // Added seconds for more frequent updates
+      hour12: true 
+    };
+    const timeString = now.toLocaleTimeString(undefined, timeOptions);
+    setCurrentTime(timeString);
+    console.log("Time updated:", timeString); // Debug log
+
+    // Update time emoji based on hour
+    const hour = now.getHours();
+    const isDaytime = hour >= 6 && hour < 18;
+    
+    if (isDaytime) {
+      setCurrentTimeEmoji("🌞");
+    } else {
+      // For night, determine moon phase based on date
+      const dayOfMonth = now.getDate();
+      if (dayOfMonth >= 1 && dayOfMonth <= 7) {
+        setCurrentTimeEmoji("🌑");
+      } else if (dayOfMonth >= 8 && dayOfMonth <= 14) {
+        setCurrentTimeEmoji("🌒");
+      } else if (dayOfMonth >= 15 && dayOfMonth <= 21) {
+        setCurrentTimeEmoji("🌓");
+      } else if (dayOfMonth >= 22 && dayOfMonth <= 28) {
+        setCurrentTimeEmoji("🌔");
+      } else {
+        setCurrentTimeEmoji("🌕");
+      }
+    }
+  };
+
+  // Set up interval to update time every second
+  useEffect(() => {
+    // Initial update
+    updateTime();
+    
+    // Set up interval for updates - update every second instead of every minute
+    const intervalId = setInterval(updateTime, 1000); // Update every second
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     const fetchWeatherData = async () => {
@@ -39,7 +89,7 @@ export default function WeatherInfo() {
         console.log("Location data:", locationData);
         
         // Get the API key from environment variables
-        const apiKey = "c7f2bcd55ac92f67ea50a60ecc6b8f61";
+        const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
         
         if (!apiKey) {
           throw new Error("OpenWeather API key is missing");
@@ -179,9 +229,9 @@ export default function WeatherInfo() {
   }
 
   return (
-    <div className="text-center py-2 text-green-100/60">
+    <div className="text-center py-2 text-green-100">
       <p className="text-lg">
-        <span className="font-medium">{weatherData.location}</span> • {weatherData.emoji} {weatherData.description} • {weatherData.temperature}°F • {weatherData.time} {weatherData.timeEmoji}
+        <span className="font-medium">{weatherData.location}</span> • {weatherData.emoji} {weatherData.description} • {weatherData.temperature}°F • {currentTime} {currentTimeEmoji}
       </p>
     </div>
   );
